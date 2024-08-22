@@ -2,6 +2,11 @@ use num_traits::{
     NumAssign, Float
 };
 
+use std::slice::{
+    Iter,
+    IterMut
+};
+
 use std::ops::{
     Neg, Add, Sub, Mul, Div,
     AddAssign, SubAssign, MulAssign, DivAssign
@@ -47,6 +52,18 @@ where
     #[inline]
     pub fn one() -> Self {
         Self::new(T::one(), T::one(), T::one(), T::one())
+    }
+
+    #[inline]
+    pub fn iter(&self) -> Iter<'_, T> {
+        let slice: &[T; 4] = unsafe { std::mem::transmute(self) };
+        slice.iter()
+    }
+
+    #[inline]
+    pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+        let slice: &mut [T; 4] = unsafe { std::mem::transmute(self) };
+        slice.iter_mut()
     }
 
     #[inline]
@@ -112,6 +129,32 @@ where
     #[inline]
     fn into(self) -> (T, T, T, T) {
         (self.x, self.y, self.z, self.w)
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec4<T>
+where
+    T: NumAssign + Copy
+{
+    type Item = &'a mut T;
+    type IntoIter = IterMut<'a, T>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec4<T>
+where
+    T: NumAssign + Copy
+{
+    type Item = &'a T;
+    type IntoIter = Iter<'a, T>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 

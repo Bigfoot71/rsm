@@ -2,6 +2,11 @@ use num_traits::{
     NumAssign, Float
 };
 
+use std::slice::{
+    Iter,
+    IterMut
+};
+
 use std::ops::{
     Neg, Add, Sub, Mul, Div,
     AddAssign, SubAssign, MulAssign, DivAssign
@@ -102,6 +107,53 @@ where
     #[inline]
     pub fn one() -> Self {
         Self::new(T::one(), T::one())
+    }
+
+    /// Returns an iterator over the elements of the vector.
+    ///
+    /// This method allows you to iterate over the components of the vector
+    /// in a read-only manner, providing immutable references to the elements.
+    ///
+    /// # Returns
+    /// An iterator of type `Iter<'_, T>` over the vector's components.
+    ///
+    /// # Example
+    /// ```
+    /// let vec = Vec3::new(1.0, 2.0, 3.0);
+    /// let mut sum = 0.0;
+    /// for &component in vec.iter() {
+    ///     sum += component;
+    /// }
+    /// assert_eq!(sum, 6.0);
+    /// ```
+    #[inline]
+    pub fn iter(&self) -> Iter<'_, T> {
+        let slice: &[T; 3] = unsafe { std::mem::transmute(self) };
+        slice.iter()
+    }
+
+    /// Returns a mutable iterator over the elements of the vector.
+    ///
+    /// This method allows you to iterate over the components of the vector
+    /// and modify them in place.
+    ///
+    /// # Returns
+    /// A mutable iterator of type `IterMut<'_, T>` over the vector's components.
+    ///
+    /// # Example
+    /// ```
+    /// let mut vec = Vec3::new(1.0, 2.0, 3.0);
+    /// for component in vec.iter_mut() {
+    ///     *component += 1.0;
+    /// }
+    /// assert_eq!(vec.x, 2.0);
+    /// assert_eq!(vec.y, 3.0);
+    /// assert_eq!(vec.z, 4.0);
+    /// ```
+    #[inline]
+    pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+        let slice: &mut [T; 3] = unsafe { std::mem::transmute(self) };
+        slice.iter_mut()
     }
 
     /// Computes the dot product of the vector with another vector.
@@ -470,6 +522,32 @@ where
     #[inline]
     fn into(self) -> (T, T) {
         (self.x, self.y)
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec2<T>
+where
+    T: NumAssign + Copy
+{
+    type Item = &'a mut T;
+    type IntoIter = IterMut<'a, T>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec2<T>
+where
+    T: NumAssign + Copy
+{
+    type Item = &'a T;
+    type IntoIter = Iter<'a, T>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 
