@@ -1,5 +1,12 @@
-use num_traits::{Zero, One, NumAssign, Float};
-use std::ops::{Neg, Add, Sub, Mul, Div};
+use num_traits::{
+    Zero, One, NumAssign, Float
+};
+
+use std::ops::{
+    Neg, Add, Sub, Mul, Div,
+    AddAssign, SubAssign, MulAssign, DivAssign
+};
+
 use std::fmt;
 
 /// Represents a 3D vector with generic numeric components.
@@ -22,59 +29,22 @@ impl<T> Vec3<T>
 where
     T: Zero + One + NumAssign + Copy,
 {
-    /// Creates a new vector with the given `x`, `y`, and `z` components.
     pub fn new(x: T, y: T, z: T) -> Self {
         Self { x, y, z }
     }
 
-    /// Creates a vector with all components set to the given value `v`.
     pub fn set(v: T) -> Self {
         Self { x: v, y: v, z: v }
     }
 
-    /// Returns a vector with all components set to zero.
     pub fn zero() -> Self {
         Self::new(T::zero(), T::zero(), T::zero())
     }
 
-    /// Returns a vector with all components set to one.
     pub fn one() -> Self {
         Self::new(T::one(), T::one(), T::one())
     }
 
-    /// Returns the length (magnitude) of the vector.
-    ///
-    /// # Constraints
-    /// - `T` must implement the `Float` trait.
-    pub fn length(&self) -> T
-    where
-        T: Float,
-    {
-        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
-    }
-
-    /// Returns a normalized (unit length) version of the vector.
-    ///
-    /// If the vector has zero length, `None` is returned.
-    ///
-    /// # Constraints
-    /// - `T` must implement the `Float` trait.
-    pub fn normalize(&self) -> Option<Self>
-    where
-        T: Float,
-    {
-        let len = self.length();
-        if len.is_zero() {
-            None
-        } else {
-            Some(Self::new(self.x / len, self.y / len, self.z / len))
-        }
-    }
-
-    /// Computes the dot product of the vector with another vector.
-    ///
-    /// # Constraints
-    /// - `T` must implement `Mul` and `Add` traits.
     pub fn dot(&self, other: &Self) -> T
     where
         T: Mul<Output = T> + Add<Output = T>,
@@ -82,10 +52,6 @@ where
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-    /// Computes the cross product of the vector with another vector.
-    ///
-    /// # Constraints
-    /// - `T` must implement `Mul` and `Sub` traits.
     pub fn cross(&self, other: &Self) -> Self
     where
         T: Mul<Output = T> + Sub<Output = T>,
@@ -97,14 +63,34 @@ where
         )
     }
 
-    /// Computes the distance between this vector and another vector.
-    ///
-    /// # Constraints
-    /// - `T` must implement `Float`, `Sub`, and `Mul` traits.
-    pub fn distance(&self, other: &Self) -> T
+    pub fn distance_squared(&self, other: &Self) -> T
     where
-        T: Float + Sub<Output = T> + Mul<Output = T>,
+        T: Mul<Output = T> + Sub<Output = T>,
     {
+        (self.x - other.x) * (self.x - other.x) +
+        (self.y - other.y) * (self.y - other.y) +
+        (self.z - other.z) * (self.z - other.z)
+    }
+}
+
+impl<T> Vec3<T>
+where
+    T: Float + Zero + One + NumAssign + Copy,
+{
+    pub fn length(&self) -> T {
+        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+    }
+
+    pub fn normalize(&self) -> Option<Self> {
+        let len = self.length();
+        if len.is_zero() {
+            None
+        } else {
+            Some(Self::new(self.x / len, self.y / len, self.z / len))
+        }
+    }
+
+    pub fn distance(&self, other: &Self) -> T {
         (
             (self.x - other.x) * (self.x - other.x) +
             (self.y - other.y) * (self.y - other.y) +
@@ -113,32 +99,7 @@ where
         .sqrt()
     }
 
-    /// Computes the squared distance between this vector and another vector.
-    ///
-    /// This avoids the cost of computing a square root.
-    ///
-    /// # Constraints
-    /// - `T` must implement `Sub` and `Mul` traits.
-    pub fn distance_squared(&self, other: &Self) -> T
-    where
-        T: Sub<Output = T> + Mul<Output = T>,
-    {
-        (self.x - other.x) * (self.x - other.x) +
-        (self.y - other.y) * (self.y - other.y) +
-        (self.z - other.z) * (self.z - other.z)
-    }
-
-    /// Computes the direction from this vector to another vector.
-    ///
-    /// Returns a normalized vector pointing from `self` to `other`.
-    /// If the vectors are identical, `None` is returned.
-    ///
-    /// # Constraints
-    /// - `T` must implement `Float`, `Sub`, and `Div` traits.
-    pub fn direction(&self, other: &Self) -> Option<Self>
-    where
-        T: Float + Sub<Output = T> + Div<Output = T>,
-    {
+    pub fn direction(&self, other: &Self) -> Option<Self> {
         Self::new(
             other.x - self.x,
             other.y - self.y,
@@ -146,17 +107,7 @@ where
         ).normalize()
     }
 
-    /// Computes the angle (in radians) between this vector and another vector.
-    ///
-    /// The angle is computed using the `atan2` function of the magnitude of the cross product of the vectors
-    /// and the dot product of the vectors.
-    ///
-    /// # Constraints
-    /// - `T` must implement the `Float` trait.
-    pub fn angle(&self, other: &Self) -> T
-    where
-        T: Float,
-    {
+    pub fn angle(&self, other: &Self) -> T {
         let cross = Self::new(
             self.y * other.z - self.z * other.y,
             self.z * other.x - self.x * other.z,
@@ -169,17 +120,7 @@ where
         len_cross.atan2(dot)
     }
 
-    /// Linearly interpolates between this vector and another vector.
-    ///
-    /// The interpolation is controlled by the parameter `t`, where `t = 0.0`
-    /// returns `self` and `t = 1.0` returns `other`.
-    ///
-    /// # Constraints
-    /// - `T` must implement the `Float` trait.
-    pub fn lerp(&self, other: &Self, t: T) -> Self
-    where
-        T: Float,
-    {
+    pub fn lerp(&self, other: &Self, t: T) -> Self {
         Self::new(
             self.x + t * (other.x - self.x),
             self.y + t * (other.y - self.y),
@@ -313,8 +254,6 @@ where
         Self::new(self.x / scalar, self.y / scalar, self.z / scalar)
     }
 }
-
-use std::ops::{AddAssign, SubAssign, MulAssign, DivAssign};
 
 impl<T> AddAssign for Vec3<T>
 where
