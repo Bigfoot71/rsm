@@ -23,46 +23,162 @@ where
     T: Zero + One + NumAssign + Copy,
 {
     /// Creates a new vector with the given `x` and `y` components.
+    ///
+    /// # Parameters
+    /// - `x`: The x-coordinate of the vector.
+    /// - `y`: The y-coordinate of the vector.
+    ///
+    /// # Returns
+    /// A `Vec2` instance with the specified `x` and `y` components.
+    ///
+    /// # Example
+    /// ```
+    /// let vec = Vec2::new(3.0, 4.0);
+    /// assert_eq!(vec.x, 3.0);
+    /// assert_eq!(vec.y, 4.0);
+    /// ```
     pub fn new(x: T, y: T) -> Self {
         Self { x, y }
     }
 
     /// Creates a vector with both components set to the given value `v`.
+    ///
+    /// # Parameters
+    /// - `v`: The value to be assigned to both the x and y components of the vector.
+    ///
+    /// # Returns
+    /// A `Vec2` instance where both components are initialized to `v`.
+    ///
+    /// # Example
+    /// ```
+    /// let vec = Vec2::set(5.0);
+    /// assert_eq!(vec.x, 5.0);
+    /// assert_eq!(vec.y, 5.0);
+    /// ```
     pub fn set(v: T) -> Self {
         Self { x: v, y: v }
     }
 
     /// Returns a vector with both components set to zero.
-    pub fn zero() -> Self {
+    ///
+    /// This is commonly used to initialize or reset a vector to a zero state.
+    ///
+    /// # Returns
+    /// A `Vec2` instance where both components are zero.
+    ///
+    /// # Example
+    /// ```
+    /// let vec = Vec2::zero();
+    /// assert_eq!(vec.x, 0.0);
+    /// assert_eq!(vec.y, 0.0);
+    /// ```
+    pub fn zero() -> Self
+    where
+        T: Zero,
+    {
         Self::new(T::zero(), T::zero())
     }
 
     /// Returns a vector with both components set to one.
-    pub fn one() -> Self {
+    ///
+    /// This is useful for initializing or scaling vectors to a unit state.
+    ///
+    /// # Returns
+    /// A `Vec2` instance where both components are one.
+    ///
+    /// # Example
+    /// ```
+    /// let vec = Vec2::one();
+    /// assert_eq!(vec.x, 1.0);
+    /// assert_eq!(vec.y, 1.0);
+    /// ```
+    pub fn one() -> Self
+    where
+        T: One,
+    {
         Self::new(T::one(), T::one())
     }
 
-    /// Returns the length (magnitude) of the vector.
+    /// Computes the dot product of the vector with another vector.
+    ///
+    /// The dot product is calculated as the sum of the products of the corresponding components of the two vectors.
+    /// It is a measure of how much one vector extends in the direction of another. The result is a scalar value.
+    ///
+    /// # Arguments
+    /// - `other`: The other vector with which to compute the dot product.
+    ///
+    /// # Returns
+    /// The dot product of the two vectors as a value of type `T`.
     ///
     /// # Constraints
-    /// - `T` must implement the `Float` trait.
-    pub fn length(&self) -> T
+    /// - `T` must implement the `Mul` and `Add` traits to support multiplication and addition operations.
+    ///
+    /// # Example
+    /// ```
+    /// let vec1 = Vec2::new(1.0, 2.0);
+    /// let vec2 = Vec2::new(3.0, 4.0);
+    /// assert_eq!(vec1.dot(&vec2), 11.0);
+    /// ```
+    pub fn dot(&self, other: &Self) -> T
     where
-        T: Float,
+        T: Mul<Output = T> + Add<Output = T>,
     {
-        (self.x * self.x + self.y * self.y).sqrt()
+        self.x * other.x + self.y * other.y
     }
 
-    /// Returns a normalized (unit length) version of the vector.
+    /// Computes the squared distance between this vector and another vector.
     ///
-    /// If the vector has zero length, `None` is returned.
+    /// This method calculates the squared distance between the two vectors without computing the square root,
+    /// which can be more efficient, especially when comparing distances or performing multiple distance calculations.
+    ///
+    /// # Arguments
+    /// - `other`: The other vector to which the squared distance is calculated.
+    ///
+    /// # Returns
+    /// The squared distance between the two vectors as a value of type `T`.
     ///
     /// # Constraints
-    /// - `T` must implement the `Float` trait.
-    pub fn normalize(&self) -> Option<Self>
+    /// - `T` must implement the `Sub` and `Mul` traits to support subtraction and multiplication operations.
+    ///
+    /// # Example
+    /// ```
+    /// let vec1 = Vec2::new(1.0, 2.0);
+    /// let vec2 = Vec2::new(4.0, 6.0);
+    /// assert_eq!(vec1.distance_squared(&vec2), 25.0);
+    /// ```
+    pub fn distance_squared(&self, other: &Self) -> T
     where
-        T: Float,
+        T: Sub<Output = T> + Mul<Output = T>,
     {
+        (self.x - other.x) * (self.x - other.x) +
+        (self.y - other.y) * (self.y - other.y)
+    }
+}
+
+impl<T> Vec2<T>
+where
+    T: Float + Zero + One + NumAssign + Copy,
+{
+    /// Returns a normalized (unit length) version of the vector.
+    ///
+    /// The normalized vector is a unit vector that points in the same direction as the original vector.
+    /// Normalization is achieved by dividing each component of the vector by its length.
+    /// If the vector has zero length (is a zero vector), `None` is returned to indicate that normalization is not possible.
+    ///
+    /// # Returns
+    /// - `Some(Self)`: A new vector with unit length pointing in the same direction as the original vector, if normalization is possible.
+    /// - `None`: If the vector has zero length, indicating that it cannot be normalized.
+    ///
+    /// # Constraints
+    /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
+    ///
+    /// # Example
+    /// ```
+    /// let vec = Vec2::new(3.0, 4.0);
+    /// let normalized = vec.normalize().unwrap();
+    /// assert_eq!(normalized.length(), 1.0);
+    /// ```
+    pub fn normalize(&self) -> Option<Self> {
         let len = self.length();
         if len.is_zero() {
             None
@@ -71,25 +187,47 @@ where
         }
     }
 
-    /// Computes the dot product of the vector with another vector.
+    /// Returns the length (magnitude) of the vector.
+    ///
+    /// The length of the vector is calculated as the Euclidean norm, which is the square root of
+    /// the sum of the squares of its components.
+    ///
+    /// # Returns
+    /// The length (magnitude) of the vector as a value of type `T`.
     ///
     /// # Constraints
-    /// - `T` must implement `Mul` and `Add` traits.
-    pub fn dot(&self, other: &Self) -> T
-    where
-        T: Mul<Output = T> + Add<Output = T>,
-    {
-        self.x * other.x + self.y * other.y
+    /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
+    ///
+    /// # Example
+    /// ```
+    /// let vec = Vec2::new(3.0, 4.0);
+    /// assert_eq!(vec.length(), 5.0);
+    /// ```
+    pub fn length(&self) -> T {
+        (self.x * self.x + self.y * self.y).sqrt()
     }
 
     /// Computes the distance between this vector and another vector.
     ///
+    /// The distance is calculated as the Euclidean distance between the two vectors, which is the length of the vector
+    /// representing the difference between them.
+    ///
+    /// # Arguments
+    /// - `other`: The other vector to which the distance is calculated.
+    ///
+    /// # Returns
+    /// The distance between the two vectors as a value of type `T`.
+    ///
     /// # Constraints
-    /// - `T` must implement `Float`, `Sub`, and `Mul` traits.
-    pub fn distance(&self, other: &Self) -> T
-    where
-        T: Float + Sub<Output = T> + Mul<Output = T>,
-    {
+    /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
+    ///
+    /// # Example
+    /// ```
+    /// let vec1 = Vec2::new(1.0, 2.0);
+    /// let vec2 = Vec2::new(4.0, 6.0);
+    /// assert_eq!(vec1.distance(&vec2), 5.0);
+    /// ```
+    pub fn distance(&self, other: &Self) -> T {
         (
             (self.x - other.x) * (self.x - other.x) +
             (self.y - other.y) * (self.y - other.y)
@@ -97,43 +235,61 @@ where
         .sqrt()
     }
 
-    /// Computes the squared distance between this vector and another vector.
-    ///
-    /// This avoids the cost of computing a square root.
-    ///
-    /// # Constraints
-    /// - `T` must implement `Sub` and `Mul` traits.
-    pub fn distance_squared(&self, other: &Self) -> T
-    where
-        T: Sub<Output = T> + Mul<Output = T>,
-    {
-        (self.x - other.x) * (self.x - other.x) +
-        (self.y - other.y) * (self.y - other.y)
-    }
-
     /// Computes the direction from this vector to another vector.
     ///
-    /// Returns a normalized vector pointing from `self` to `other`.
-    /// If the vectors are identical, `None` is returned.
+    /// This method calculates a normalized vector that points from `self` to `other`. If `self` and `other` are the same vector,
+    /// resulting in a zero-length vector, `None` is returned.
+    ///
+    /// # Arguments
+    /// - `other`: The target vector to which the direction is calculated.
+    ///
+    /// # Returns
+    /// An `Option<Self>` where:
+    /// - `Some(Self)` contains the normalized direction vector pointing from `self` to `other` if the vectors are not identical.
+    /// - `None` if `self` and `other` are identical (i.e., the direction vector has zero length).
     ///
     /// # Constraints
-    /// - `T` must implement `Float`, `Sub`, and `Div` traits.
-    pub fn direction(&self, other: &Self) -> Option<Self>
-    where
-        T: Float + Sub<Output = T> + Div<Output = T>,
-    {
-        Self::new(
+    /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
+    ///
+    /// # Example
+    /// ```
+    /// let vec1 = Vec2::new(1.0, 2.0);
+    /// let vec2 = Vec2::new(4.0, 6.0);
+    /// if let Some(direction) = vec1.direction(&vec2) {
+    ///     assert_eq!(direction, Vec2::new(0.6, 0.8));
+    /// } else {
+    ///     panic!("The vectors are identical, so no direction can be computed.");
+    /// }
+    /// ```
+    pub fn direction(&self, other: &Self) -> Option<Self> {
+        let direction = Self::new(
             other.x - self.x,
-            other.y - self.y).normalize()
+            other.y - self.y
+        );
+        direction.normalize()
     }
 
     /// Computes the angle (in radians) between this vector and another vector.
     ///
-    /// The angle is computed using the arctangent of the cross product and dot product of the vectors.
-    pub fn angle(&self, other: &Self) -> T
-    where
-        T: Float,
-    {
+    /// This method calculates the angle between `self` and `other` vectors using the arctangent of the cross product
+    /// and dot product of the vectors. The result is in radians, and the angle is measured counterclockwise.
+    ///
+    /// # Arguments
+    /// - `other`: The other vector to which the angle is computed.
+    ///
+    /// # Returns
+    /// The angle between the vectors as a value of type `T`.
+    ///
+    /// # Constraints
+    /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
+    ///
+    /// # Example
+    /// ```
+    /// let vec1 = Vec2::new(1.0, 0.0);
+    /// let vec2 = Vec2::new(0.0, 1.0);
+    /// assert_eq!(vec1.angle(&vec2), std::f32::consts::PI / 2.0);
+    /// ```
+    pub fn angle(&self, other: &Self) -> T {
         let dot = self.x * other.x + self.y * other.y;
         let det = self.x * other.y - self.y * other.x;
         det.atan2(dot)
@@ -141,11 +297,26 @@ where
 
     /// Computes the angle (in radians) of the line defined by two vectors.
     ///
-    /// The vectors should be normalized. The angle is measured from the positive x-axis to the line.
-    pub fn line_angle(&self, end: &Self) -> T
-    where
-        T: Float,
-    {
+    /// This method calculates the angle of the line segment defined by `self` and `end` relative to the positive x-axis.
+    /// The vectors should be normalized for accurate results. The angle is measured from the positive x-axis to the line,
+    /// and the result is in radians. The direction is clockwise from the positive x-axis.
+    ///
+    /// # Arguments
+    /// - `end`: The end point of the line segment from `self` to `end`.
+    ///
+    /// # Returns
+    /// The angle of the line segment as a value of type `T`.
+    ///
+    /// # Constraints
+    /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
+    ///
+    /// # Example
+    /// ```
+    /// let start = Vec2::new(1.0, 1.0);
+    /// let end = Vec2::new(4.0, 3.0);
+    /// assert_eq!(start.line_angle(&end), (-0.6435011).abs()); // Example result
+    /// ```
+    pub fn line_angle(&self, end: &Self) -> T {
         // Note: The angle is measured clockwise from the positive x-axis.
         // If vectors are normalized, this is simply -atan2 of the difference.
         - (end.y - self.y).atan2(end.x - self.x)
@@ -153,15 +324,28 @@ where
 
     /// Linearly interpolates between this vector and another vector.
     ///
-    /// The interpolation is controlled by the parameter `t`, where `t = 0.0`
-    /// returns `self` and `t = 1.0` returns `other`.
+    /// This method performs linear interpolation between `self` and `other` based on the parameter `t`. 
+    /// When `t` is `0.0`, the result is `self`. When `t` is `1.0`, the result is `other`. For values of `t` 
+    /// between `0.0` and `1.0`, the result is a point between `self` and `other` on the line segment connecting them.
+    ///
+    /// # Arguments
+    /// - `other`: The vector to interpolate towards.
+    /// - `t`: The interpolation factor, where `t` ranges from `0.0` to `1.0`.
+    ///
+    /// # Returns
+    /// A new vector representing the point that is linearly interpolated between `self` and `other`.
     ///
     /// # Constraints
-    /// - `T` must implement the `Float` trait.
-    pub fn lerp(&self, other: &Self, t: T) -> Self
-    where
-        T: Float + Sub<Output = T> + Mul<Output = T>,
-    {
+    /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
+    ///
+    /// # Example
+    /// ```
+    /// let start = Vec2::new(0.0, 0.0);
+    /// let end = Vec2::new(10.0, 10.0);
+    /// let result = start.lerp(&end, 0.5);
+    /// assert_eq!(result, Vec2::new(5.0, 5.0));
+    /// ```
+    pub fn lerp(&self, other: &Self, t: T) -> Self {
         Self::new(
             self.x + t * (other.x - self.x),
             self.y + t * (other.y - self.y))
@@ -178,10 +362,18 @@ where
     ///
     /// # Returns
     /// A new vector representing the reflection of `self` around `normal`.
-    pub fn reflect(&self, normal: &Self) -> Self
-    where
-        T: Float + Sub<Output = T> + Mul<Output = T> + Copy,
-    {
+    ///
+    /// # Constraints
+    /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
+    ///
+    /// # Example
+    /// ```
+    /// let incident = Vec2::new(1.0, -1.0);
+    /// let normal = Vec2::new(0.0, 1.0).normalize().unwrap(); // Normalized normal vector
+    /// let reflected = incident.reflect(&normal);
+    /// assert_eq!(reflected, Vec2::new(1.0, 1.0)); // Reflection of (1.0, -1.0) around (0.0, 1.0) is (1.0, 1.0)
+    /// ```
+    pub fn reflect(&self, normal: &Self) -> Self {
         let dot = self.x * normal.x + self.y * normal.y;
         let two = T::one() + T::one(); // Calculate 2.0 as T::one() + T::one()
 
@@ -205,13 +397,13 @@ where
     /// An `Option<Self>`. Returns `Some(Self)` with the direction of the refracted ray if refraction is possible,
     /// or `None` if refraction is not possible (e.g., due to total internal reflection).
     ///
+    /// # Constraints
+    /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
+    ///
     /// # Notes
     /// - The incoming ray and the normal vector should be normalized.
     /// - The result will be `None` if total internal reflection occurs (i.e., `d < 0`).
-    pub fn refract(&self, normal: &Self, r: T) -> Option<Self>
-    where
-        T: Float,
-    {
+    pub fn refract(&self, normal: &Self, r: T) -> Option<Self> {
         // Calculate the dot product between the incoming ray and the normal
         let dot = self.dot(normal);
 
@@ -240,7 +432,6 @@ where
         }
     }
 }
-
 
 impl<T> fmt::Display for Vec2<T>
 where
