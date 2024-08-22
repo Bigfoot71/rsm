@@ -159,6 +159,26 @@ impl<T> Vec2<T>
 where
     T: Float + Zero + One + NumAssign + Copy,
 {
+    /// Returns the length (magnitude) of the vector.
+    ///
+    /// The length of the vector is calculated as the Euclidean norm, which is the square root of
+    /// the sum of the squares of its components.
+    ///
+    /// # Returns
+    /// The length (magnitude) of the vector as a value of type `T`.
+    ///
+    /// # Constraints
+    /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
+    ///
+    /// # Example
+    /// ```
+    /// let vec = Vec2::new(3.0, 4.0);
+    /// assert_eq!(vec.length(), 5.0);
+    /// ```
+    pub fn length(&self) -> T {
+        (self.x * self.x + self.y * self.y).sqrt()
+    }
+
     /// Returns a normalized (unit length) version of the vector.
     ///
     /// The normalized vector is a unit vector that points in the same direction as the original vector.
@@ -185,26 +205,6 @@ where
         } else {
             Some(Self::new(self.x / len, self.y / len))
         }
-    }
-
-    /// Returns the length (magnitude) of the vector.
-    ///
-    /// The length of the vector is calculated as the Euclidean norm, which is the square root of
-    /// the sum of the squares of its components.
-    ///
-    /// # Returns
-    /// The length (magnitude) of the vector as a value of type `T`.
-    ///
-    /// # Constraints
-    /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
-    ///
-    /// # Example
-    /// ```
-    /// let vec = Vec2::new(3.0, 4.0);
-    /// assert_eq!(vec.length(), 5.0);
-    /// ```
-    pub fn length(&self) -> T {
-        (self.x * self.x + self.y * self.y).sqrt()
     }
 
     /// Computes the distance between this vector and another vector.
