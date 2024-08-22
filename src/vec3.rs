@@ -29,22 +29,27 @@ impl<T> Vec3<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     pub fn new(x: T, y: T, z: T) -> Self {
         Self { x, y, z }
     }
 
+    #[inline]
     pub fn set(v: T) -> Self {
         Self { x: v, y: v, z: v }
     }
 
+    #[inline]
     pub fn zero() -> Self {
         Self::new(T::zero(), T::zero(), T::zero())
     }
 
+    #[inline]
     pub fn one() -> Self {
         Self::new(T::one(), T::one(), T::one())
     }
 
+    #[inline]
     pub fn dot(&self, other: &Self) -> T
     where
         T: Mul<Output = T> + Add<Output = T>,
@@ -52,6 +57,7 @@ where
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
+    #[inline]
     pub fn cross(&self, other: &Self) -> Self {
         Self::new(
             self.y * other.z - self.z * other.y,
@@ -60,6 +66,7 @@ where
         )
     }
 
+    #[inline]
     pub fn distance_squared(&self, other: &Self) -> T {
         (self.x - other.x) * (self.x - other.x) +
         (self.y - other.y) * (self.y - other.y) +
@@ -71,10 +78,12 @@ impl<T> Vec3<T>
 where
     T: NumAssign + Float,
 {
+    #[inline]
     pub fn length(&self) -> T {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
+    #[inline]
     pub fn normalize(&self) -> Option<Self> {
         let len = self.length();
         if len.is_zero() {
@@ -84,6 +93,7 @@ where
         }
     }
 
+    #[inline]
     pub fn distance(&self, other: &Self) -> T {
         (
             (self.x - other.x) * (self.x - other.x) +
@@ -93,6 +103,7 @@ where
         .sqrt()
     }
 
+    #[inline]
     pub fn direction(&self, other: &Self) -> Option<Self> {
         Self::new(
             other.x - self.x,
@@ -101,6 +112,7 @@ where
         ).normalize()
     }
 
+    #[inline]
     pub fn angle(&self, other: &Self) -> T {
         let cross = Self::new(
             self.y * other.z - self.z * other.y,
@@ -114,6 +126,7 @@ where
         len_cross.atan2(dot)
     }
 
+    #[inline]
     pub fn lerp(&self, other: &Self, t: T) -> Self {
         Self::new(
             self.x + t * (other.x - self.x),
@@ -127,6 +140,7 @@ impl<T> fmt::Display for Vec3<T>
 where
     T: fmt::Display,
 {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}, {}, {})", self.x, self.y, self.z)
     }
@@ -136,6 +150,7 @@ impl<T> From<(T, T, T)> for Vec3<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn from(tuple: (T, T, T)) -> Self {
         Vec3::new(tuple.0, tuple.1, tuple.2)
     }
@@ -145,6 +160,7 @@ impl<T> Into<(T, T, T)> for Vec3<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn into(self) -> (T, T, T) {
         (self.x, self.y, self.z)
     }
@@ -156,6 +172,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn neg(self) -> Self::Output {
         Self::new(-self.x, -self.y, -self.z)
     }
@@ -167,6 +184,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn add(self, other: Self) -> Self {
         Self::new(self.x + other.x, self.y + other.y, self.z + other.z)
     }
@@ -178,6 +196,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn add(self, scalar: T) -> Self {
         Self::new(self.x + scalar, self.y + scalar, self.z + scalar)
     }
@@ -189,6 +208,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn sub(self, other: Self) -> Self {
         Self::new(self.x - other.x, self.y - other.y, self.z - other.z)
     }
@@ -200,6 +220,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn sub(self, scalar: T) -> Self {
         Self::new(self.x - scalar, self.y - scalar, self.z - scalar)
     }
@@ -211,6 +232,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn mul(self, other: Self) -> Self {
         Self::new(self.x * other.x, self.y * other.y, self.z * other.z)
     }
@@ -222,6 +244,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn mul(self, scalar: T) -> Self {
         Self::new(self.x * scalar, self.y * scalar, self.z * scalar)
     }
@@ -233,6 +256,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn div(self, other: Self) -> Self {
         Self::new(self.x / other.x, self.y / other.y, self.z / other.z)
     }
@@ -244,6 +268,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn div(self, scalar: T) -> Self {
         Self::new(self.x / scalar, self.y / scalar, self.z / scalar)
     }
@@ -253,6 +278,7 @@ impl<T> AddAssign for Vec3<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn add_assign(&mut self, other: Self) {
         self.x += other.x;
         self.y += other.y;
@@ -264,6 +290,7 @@ impl<T> AddAssign<T> for Vec3<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn add_assign(&mut self, scalar: T) {
         self.x += scalar;
         self.y += scalar;
@@ -275,6 +302,7 @@ impl<T> SubAssign for Vec3<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn sub_assign(&mut self, other: Self) {
         self.x -= other.x;
         self.y -= other.y;
@@ -286,6 +314,7 @@ impl<T> SubAssign<T> for Vec3<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn sub_assign(&mut self, scalar: T) {
         self.x -= scalar;
         self.y -= scalar;
@@ -297,6 +326,7 @@ impl<T> MulAssign for Vec3<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn mul_assign(&mut self, other: Self) {
         self.x *= other.x;
         self.y *= other.y;
@@ -308,6 +338,7 @@ impl<T> MulAssign<T> for Vec3<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn mul_assign(&mut self, scalar: T) {
         self.x *= scalar;
         self.y *= scalar;
@@ -319,6 +350,7 @@ impl<T> DivAssign for Vec3<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn div_assign(&mut self, other: Self) {
         self.x /= other.x;
         self.y /= other.y;
@@ -330,6 +362,7 @@ impl<T> DivAssign<T> for Vec3<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn div_assign(&mut self, scalar: T) {
         self.x /= scalar;
         self.y /= scalar;

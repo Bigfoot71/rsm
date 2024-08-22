@@ -44,6 +44,7 @@ where
     /// assert_eq!(vec.x, 3.0);
     /// assert_eq!(vec.y, 4.0);
     /// ```
+    #[inline]
     pub fn new(x: T, y: T) -> Self {
         Self { x, y }
     }
@@ -62,6 +63,7 @@ where
     /// assert_eq!(vec.x, 5.0);
     /// assert_eq!(vec.y, 5.0);
     /// ```
+    #[inline]
     pub fn set(v: T) -> Self {
         Self { x: v, y: v }
     }
@@ -79,6 +81,7 @@ where
     /// assert_eq!(vec.x, 0.0);
     /// assert_eq!(vec.y, 0.0);
     /// ```
+    #[inline]
     pub fn zero() -> Self {
         Self::new(T::zero(), T::zero())
     }
@@ -96,6 +99,7 @@ where
     /// assert_eq!(vec.x, 1.0);
     /// assert_eq!(vec.y, 1.0);
     /// ```
+    #[inline]
     pub fn one() -> Self {
         Self::new(T::one(), T::one())
     }
@@ -120,6 +124,7 @@ where
     /// let vec2 = Vec2::new(3.0, 4.0);
     /// assert_eq!(vec1.dot(&vec2), 11.0);
     /// ```
+    #[inline]
     pub fn dot(&self, other: &Self) -> T {
         self.x * other.x + self.y * other.y
     }
@@ -144,6 +149,7 @@ where
     /// let vec2 = Vec2::new(4.0, 6.0);
     /// assert_eq!(vec1.distance_squared(&vec2), 25.0);
     /// ```
+    #[inline]
     pub fn distance_squared(&self, other: &Self) -> T {
         (self.x - other.x) * (self.x - other.x) +
         (self.y - other.y) * (self.y - other.y)
@@ -170,6 +176,7 @@ where
     /// let vec = Vec2::new(3.0, 4.0);
     /// assert_eq!(vec.length(), 5.0);
     /// ```
+    #[inline]
     pub fn length(&self) -> T {
         (self.x * self.x + self.y * self.y).sqrt()
     }
@@ -193,6 +200,7 @@ where
     /// let normalized = vec.normalize().unwrap();
     /// assert_eq!(normalized.length(), 1.0);
     /// ```
+    #[inline]
     pub fn normalize(&self) -> Option<Self> {
         let len = self.length();
         if len.is_zero() {
@@ -222,6 +230,7 @@ where
     /// let vec2 = Vec2::new(4.0, 6.0);
     /// assert_eq!(vec1.distance(&vec2), 5.0);
     /// ```
+    #[inline]
     pub fn distance(&self, other: &Self) -> T {
         (
             (self.x - other.x) * (self.x - other.x) +
@@ -256,6 +265,7 @@ where
     ///     panic!("The vectors are identical, so no direction can be computed.");
     /// }
     /// ```
+    #[inline]
     pub fn direction(&self, other: &Self) -> Option<Self> {
         let direction = Self::new(
             other.x - self.x,
@@ -284,6 +294,7 @@ where
     /// let vec2 = Vec2::new(0.0, 1.0);
     /// assert_eq!(vec1.angle(&vec2), std::f32::consts::PI / 2.0);
     /// ```
+    #[inline]
     pub fn angle(&self, other: &Self) -> T {
         let dot = self.x * other.x + self.y * other.y;
         let det = self.x * other.y - self.y * other.x;
@@ -311,6 +322,7 @@ where
     /// let end = Vec2::new(4.0, 3.0);
     /// assert_eq!(start.line_angle(&end), (-0.6435011).abs()); // Example result
     /// ```
+    #[inline]
     pub fn line_angle(&self, end: &Self) -> T {
         // Note: The angle is measured clockwise from the positive x-axis.
         // If vectors are normalized, this is simply -atan2 of the difference.
@@ -340,6 +352,7 @@ where
     /// let result = start.lerp(&end, 0.5);
     /// assert_eq!(result, Vec2::new(5.0, 5.0));
     /// ```
+    #[inline]
     pub fn lerp(&self, other: &Self, t: T) -> Self {
         Self::new(
             self.x + t * (other.x - self.x),
@@ -368,6 +381,7 @@ where
     /// let reflected = incident.reflect(&normal);
     /// assert_eq!(reflected, Vec2::new(1.0, 1.0)); // Reflection of (1.0, -1.0) around (0.0, 1.0) is (1.0, 1.0)
     /// ```
+    #[inline]
     pub fn reflect(&self, normal: &Self) -> Self {
         let dot = self.x * normal.x + self.y * normal.y;
         let two = T::one() + T::one(); // Calculate 2.0 as T::one() + T::one()
@@ -398,6 +412,7 @@ where
     /// # Notes
     /// - The incoming ray and the normal vector should be normalized.
     /// - The result will be `None` if total internal reflection occurs (i.e., `d < 0`).
+    #[inline]
     pub fn refract(&self, normal: &Self, r: T) -> Option<Self> {
         // Calculate the dot product between the incoming ray and the normal
         let dot = self.dot(normal);
@@ -432,6 +447,7 @@ impl<T> fmt::Display for Vec2<T>
 where
     T: fmt::Display,
 {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}, {})", self.x, self.y)
     }
@@ -441,6 +457,7 @@ impl<T> From<(T, T)> for Vec2<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn from(tuple: (T, T)) -> Self {
         Vec2::new(tuple.0, tuple.1)
     }
@@ -450,6 +467,7 @@ impl<T> Into<(T, T)> for Vec2<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn into(self) -> (T, T) {
         (self.x, self.y)
     }
@@ -461,6 +479,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn neg(self) -> Self::Output {
         Self::new(-self.x, -self.y)
     }
@@ -471,6 +490,8 @@ where
     T: NumAssign + Copy,
 {
     type Output = Self;
+
+    #[inline]
     fn add(self, other: Self) -> Self {
         Self::new(self.x + other.x, self.y + other.y)
     }
@@ -481,6 +502,8 @@ where
     T: NumAssign + Copy,
 {
     type Output = Self;
+
+    #[inline]
     fn add(self, scalar: T) -> Self {
         Self::new(self.x + scalar, self.y + scalar)
     }
@@ -491,6 +514,8 @@ where
     T: NumAssign + Copy,
 {
     type Output = Self;
+
+    #[inline]
     fn sub(self, other: Self) -> Self {
         Self::new(self.x - other.x, self.y - other.y)
     }
@@ -501,6 +526,8 @@ where
     T: NumAssign + Copy,
 {
     type Output = Self;
+
+    #[inline]
     fn sub(self, scalar: T) -> Self {
         Self::new(self.x - scalar, self.y - scalar)
     }
@@ -511,6 +538,8 @@ where
     T: NumAssign + Copy,
 {
     type Output = Self;
+
+    #[inline]
     fn mul(self, other: Self) -> Self {
         Self::new(self.x * other.x, self.y * other.y)
     }
@@ -521,6 +550,8 @@ where
     T: NumAssign + Copy,
 {
     type Output = Self;
+
+    #[inline]
     fn mul(self, scalar: T) -> Self {
         Self::new(self.x * scalar, self.y * scalar)
     }
@@ -531,6 +562,8 @@ where
     T: NumAssign + Copy,
 {
     type Output = Self;
+
+    #[inline]
     fn div(self, other: Self) -> Self {
         Self::new(self.x / other.x, self.y / other.y)
     }
@@ -541,6 +574,8 @@ where
     T: NumAssign + Copy,
 {
     type Output = Self;
+
+    #[inline]
     fn div(self, scalar: T) -> Self {
         Self::new(self.x / scalar, self.y / scalar)
     }
@@ -550,6 +585,7 @@ impl<T> AddAssign for Vec2<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn add_assign(&mut self, other: Self) {
         self.x += other.x;
         self.y += other.y;
@@ -560,6 +596,7 @@ impl<T> AddAssign<T> for Vec2<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn add_assign(&mut self, scalar: T) {
         self.x += scalar;
         self.y += scalar;
@@ -570,6 +607,7 @@ impl<T> SubAssign for Vec2<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn sub_assign(&mut self, other: Self) {
         self.x -= other.x;
         self.y -= other.y;
@@ -580,6 +618,7 @@ impl<T> SubAssign<T> for Vec2<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn sub_assign(&mut self, scalar: T) {
         self.x -= scalar;
         self.y -= scalar;
@@ -590,6 +629,7 @@ impl<T> MulAssign for Vec2<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn mul_assign(&mut self, other: Self) {
         self.x *= other.x;
         self.y *= other.y;
@@ -600,6 +640,7 @@ impl<T> MulAssign<T> for Vec2<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn mul_assign(&mut self, scalar: T) {
         self.x *= scalar;
         self.y *= scalar;
@@ -610,6 +651,7 @@ impl<T> DivAssign for Vec2<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn div_assign(&mut self, other: Self) {
         self.x /= other.x;
         self.y /= other.y;
@@ -620,6 +662,7 @@ impl<T> DivAssign<T> for Vec2<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn div_assign(&mut self, scalar: T) {
         self.x /= scalar;
         self.y /= scalar;

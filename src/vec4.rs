@@ -29,26 +29,32 @@ impl<T> Vec4<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     pub fn new(x: T, y: T, z: T, w: T) -> Self {
         Self { x, y, z, w }
     }
 
+    #[inline]
     pub fn set(v: T) -> Self {
         Self { x: v, y: v, z: v, w: v }
     }
 
+    #[inline]
     pub fn zero() -> Self {
         Self::new(T::zero(), T::zero(), T::zero(), T::zero())
     }
 
+    #[inline]
     pub fn one() -> Self {
         Self::new(T::one(), T::one(), T::one(), T::one())
     }
 
+    #[inline]
     pub fn dot(&self, other: &Self) -> T {
         self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
     }
 
+    #[inline]
     pub fn lerp(&self, other: &Self, t: T) -> Self {
         Self::new(
             self.x + t * (other.x - self.x),
@@ -63,10 +69,12 @@ impl<T> Vec4<T>
 where
     T: NumAssign + Float,
 {
+    #[inline]
     pub fn length(&self) -> T {
         (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
     }
 
+    #[inline]
     pub fn normalize(&self) -> Option<Self> {
         let len = self.length();
         if len.is_zero() {
@@ -81,6 +89,7 @@ impl<T> fmt::Display for Vec4<T>
 where
     T: fmt::Display,
 {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}, {}, {}, {})", self.x, self.y, self.z, self.w)
     }
@@ -90,6 +99,7 @@ impl<T> From<(T, T, T, T)> for Vec4<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn from(tuple: (T, T, T, T)) -> Self {
         Vec4::new(tuple.0, tuple.1, tuple.2, tuple.3)
     }
@@ -99,6 +109,7 @@ impl<T> Into<(T, T, T, T)> for Vec4<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn into(self) -> (T, T, T, T) {
         (self.x, self.y, self.z, self.w)
     }
@@ -110,6 +121,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn neg(self) -> Self::Output {
         Self::new(-self.x, -self.y, -self.z, -self.w)
     }
@@ -121,6 +133,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn add(self, other: Self) -> Self {
         Self::new(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
     }
@@ -132,6 +145,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn add(self, scalar: T) -> Self {
         Self::new(self.x + scalar, self.y + scalar, self.z + scalar, self.w + scalar)
     }
@@ -143,6 +157,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn sub(self, other: Self) -> Self {
         Self::new(self.x - other.x, self.y - other.y, self.z - other.z, self.w - other.w)
     }
@@ -154,6 +169,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn sub(self, scalar: T) -> Self {
         Self::new(self.x - scalar, self.y - scalar, self.z - scalar, self.w - scalar)
     }
@@ -165,6 +181,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn mul(self, other: Self) -> Self {
         Self::new(self.x * other.x, self.y * other.y, self.z * other.z, self.w * other.w)
     }
@@ -176,6 +193,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn mul(self, scalar: T) -> Self {
         Self::new(self.x * scalar, self.y * scalar, self.z * scalar, self.w * scalar)
     }
@@ -187,6 +205,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn div(self, other: Self) -> Self {
         Self::new(self.x / other.x, self.y / other.y, self.z / other.z, self.w / other.w)
     }
@@ -198,6 +217,7 @@ where
 {
     type Output = Self;
 
+    #[inline]
     fn div(self, scalar: T) -> Self {
         Self::new(self.x / scalar, self.y / scalar, self.z / scalar, self.w / scalar)
     }
@@ -207,6 +227,7 @@ impl<T> AddAssign for Vec4<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn add_assign(&mut self, other: Self) {
         self.x += other.x;
         self.y += other.y;
@@ -219,6 +240,7 @@ impl<T> AddAssign<T> for Vec4<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn add_assign(&mut self, scalar: T) {
         self.x += scalar;
         self.y += scalar;
@@ -231,6 +253,7 @@ impl<T> SubAssign for Vec4<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn sub_assign(&mut self, other: Self) {
         self.x -= other.x;
         self.y -= other.y;
@@ -243,6 +266,7 @@ impl<T> SubAssign<T> for Vec4<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn sub_assign(&mut self, scalar: T) {
         self.x -= scalar;
         self.y -= scalar;
@@ -255,6 +279,7 @@ impl<T> MulAssign for Vec4<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn mul_assign(&mut self, other: Self) {
         self.x *= other.x;
         self.y *= other.y;
@@ -267,6 +292,7 @@ impl<T> MulAssign<T> for Vec4<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn mul_assign(&mut self, scalar: T) {
         self.x *= scalar;
         self.y *= scalar;
@@ -279,6 +305,7 @@ impl<T> DivAssign for Vec4<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn div_assign(&mut self, other: Self) {
         self.x /= other.x;
         self.y /= other.y;
@@ -291,6 +318,7 @@ impl<T> DivAssign<T> for Vec4<T>
 where
     T: NumAssign + Copy,
 {
+    #[inline]
     fn div_assign(&mut self, scalar: T) {
         self.x /= scalar;
         self.y /= scalar;
