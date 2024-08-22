@@ -142,13 +142,13 @@ where
     /// Computes the angle (in radians) of the line defined by two vectors.
     ///
     /// The vectors should be normalized. The angle is measured from the positive x-axis to the line.
-    pub fn line_angle(start: &Self, end: &Self) -> T
+    pub fn line_angle(&self, end: &Self) -> T
     where
         T: Float,
     {
         // Note: The angle is measured clockwise from the positive x-axis.
         // If vectors are normalized, this is simply -atan2 of the difference.
-        - (end.y - start.y).atan2(end.x - start.x)
+        - (end.y - self.y).atan2(end.x - self.x)
     }
 
     /// Linearly interpolates between this vector and another vector.
@@ -160,11 +160,84 @@ where
     /// - `T` must implement the `Float` trait.
     pub fn lerp(&self, other: &Self, t: T) -> Self
     where
-        T: Float,
+        T: Float + Sub<Output = T> + Mul<Output = T>,
     {
         Self::new(
             self.x + t * (other.x - self.x),
             self.y + t * (other.y - self.y))
+    }
+
+    /// Computes the reflection of the vector around a given normal vector.
+    ///
+    /// The reflection is calculated using the formula:
+    /// `reflected = self - 2 * (self · normal) * normal`
+    /// where `self · normal` is the dot product between `self` and `normal`.
+    ///
+    /// # Parameters
+    /// - `normal`: The normal vector around which to reflect. This vector should be normalized.
+    ///
+    /// # Returns
+    /// A new vector representing the reflection of `self` around `normal`.
+    pub fn reflect(&self, normal: &Self) -> Self
+    where
+        T: Float + Sub<Output = T> + Mul<Output = T> + Copy,
+    {
+        let dot = self.x * normal.x + self.y * normal.y;
+        let two = T::one() + T::one(); // Calculate 2.0 as T::one() + T::one()
+
+        Self::new(
+            self.x - (two * normal.x) * dot,
+            self.y - (two * normal.y) * dot
+        )
+    }
+
+    /// Computes the direction of a refracted ray.
+    ///
+    /// This function calculates the direction of a refracted ray given the direction of the incoming ray,
+    /// the normal vector of the surface, and the ratio of the refractive indices of the two media.
+    ///
+    /// # Parameters
+    /// - `normal`: The normalized normal vector of the interface between two optical media.
+    /// - `r`: The ratio of the refractive index of the medium from where the ray comes
+    ///         to the refractive index of the medium on the other side of the surface.
+    ///
+    /// # Returns
+    /// An `Option<Self>`. Returns `Some(Self)` with the direction of the refracted ray if refraction is possible,
+    /// or `None` if refraction is not possible (e.g., due to total internal reflection).
+    ///
+    /// # Notes
+    /// - The incoming ray and the normal vector should be normalized.
+    /// - The result will be `None` if total internal reflection occurs (i.e., `d < 0`).
+    pub fn refract(&self, normal: &Self, r: T) -> Option<Self>
+    where
+        T: Float,
+    {
+        // Calculate the dot product between the incoming ray and the normal
+        let dot = self.dot(normal);
+
+        // Compute the squared ratio of the refractive indices
+        let r2 = r * r;
+
+        // Compute the discriminant to check for total internal reflection
+        let one = T::one();
+        let zero = T::zero();
+        let d = one - r2 * (one - dot * dot);
+
+        // If d is negative, total internal reflection occurs, so refraction is not possible
+        if d < zero {
+            None
+        } else {
+            // Calculate the square root of the discriminant
+            let sqrt_d = d.sqrt();
+            
+            // Calculate the direction of the refracted ray
+            let r_dot = r * dot;
+            let v_x = r * self.x - (r_dot + sqrt_d) * normal.x;
+            let v_y = r * self.y - (r_dot + sqrt_d) * normal.y;
+
+            // Return the refracted ray direction
+            Some(Self::new(v_x, v_y))
+        }
     }
 }
 
