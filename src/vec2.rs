@@ -129,19 +129,26 @@ where
 
     /// Computes the angle (in radians) between this vector and another vector.
     ///
-    /// The angle is computed using the arccosine of the dot product of the vectors
-    /// divided by the product of their lengths.
-    ///
-    /// # Constraints
-    /// - `T` must implement the `Float` trait.
+    /// The angle is computed using the arctangent of the cross product and dot product of the vectors.
     pub fn angle(&self, other: &Self) -> T
     where
         T: Float,
     {
-        let dot = self.dot(other);
-        let len1 = self.length();
-        let len2 = other.length();
-        (dot / (len1 * len2)).acos()
+        let dot = self.x * other.x + self.y * other.y;
+        let det = self.x * other.y - self.y * other.x;
+        det.atan2(dot)
+    }
+
+    /// Computes the angle (in radians) of the line defined by two vectors.
+    ///
+    /// The vectors should be normalized. The angle is measured from the positive x-axis to the line.
+    pub fn line_angle(start: &Self, end: &Self) -> T
+    where
+        T: Float,
+    {
+        // Note: The angle is measured clockwise from the positive x-axis.
+        // If vectors are normalized, this is simply -atan2 of the difference.
+        - (end.y - start.y).atan2(end.x - start.x)
     }
 
     /// Linearly interpolates between this vector and another vector.
