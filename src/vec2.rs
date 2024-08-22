@@ -1,5 +1,12 @@
-use num_traits::{Zero, One, NumAssign, Float};
-use std::ops::{Neg, Add, Sub, Mul, Div};
+use num_traits::{
+    Zero, One, NumAssign, Float
+};
+
+use std::ops::{
+    Neg, Add, Sub, Mul, Div,
+    AddAssign, SubAssign, MulAssign, DivAssign
+};
+
 use std::fmt;
 
 /// Represents a 2D vector with generic numeric components.
@@ -550,8 +557,6 @@ where
         Self::new(self.x / scalar, self.y / scalar)
     }
 }
-
-use std::ops::{AddAssign, SubAssign, MulAssign, DivAssign};
 
 impl<T> AddAssign for Vec2<T>
 where
