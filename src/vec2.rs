@@ -1,5 +1,5 @@
 use num_traits::{
-    Zero, One, NumAssign, Float
+    NumAssign, Float
 };
 
 use std::ops::{
@@ -27,7 +27,7 @@ pub struct Vec2<T> {
 
 impl<T> Vec2<T>
 where
-    T: Zero + One + NumAssign + Copy,
+    T: NumAssign + Copy,
 {
     /// Creates a new vector with the given `x` and `y` components.
     ///
@@ -79,10 +79,7 @@ where
     /// assert_eq!(vec.x, 0.0);
     /// assert_eq!(vec.y, 0.0);
     /// ```
-    pub fn zero() -> Self
-    where
-        T: Zero,
-    {
+    pub fn zero() -> Self {
         Self::new(T::zero(), T::zero())
     }
 
@@ -99,10 +96,7 @@ where
     /// assert_eq!(vec.x, 1.0);
     /// assert_eq!(vec.y, 1.0);
     /// ```
-    pub fn one() -> Self
-    where
-        T: One,
-    {
+    pub fn one() -> Self {
         Self::new(T::one(), T::one())
     }
 
@@ -126,10 +120,7 @@ where
     /// let vec2 = Vec2::new(3.0, 4.0);
     /// assert_eq!(vec1.dot(&vec2), 11.0);
     /// ```
-    pub fn dot(&self, other: &Self) -> T
-    where
-        T: Mul<Output = T> + Add<Output = T>,
-    {
+    pub fn dot(&self, other: &Self) -> T {
         self.x * other.x + self.y * other.y
     }
 
@@ -153,10 +144,7 @@ where
     /// let vec2 = Vec2::new(4.0, 6.0);
     /// assert_eq!(vec1.distance_squared(&vec2), 25.0);
     /// ```
-    pub fn distance_squared(&self, other: &Self) -> T
-    where
-        T: Sub<Output = T> + Mul<Output = T>,
-    {
+    pub fn distance_squared(&self, other: &Self) -> T {
         (self.x - other.x) * (self.x - other.x) +
         (self.y - other.y) * (self.y - other.y)
     }
@@ -164,7 +152,7 @@ where
 
 impl<T> Vec2<T>
 where
-    T: Float + Zero + One + NumAssign + Copy,
+    T: NumAssign + Float,
 {
     /// Returns the length (magnitude) of the vector.
     ///
@@ -451,7 +439,7 @@ where
 
 impl<T> From<(T, T)> for Vec2<T>
 where
-    T: Zero + One + NumAssign + Copy,
+    T: NumAssign + Copy,
 {
     fn from(tuple: (T, T)) -> Self {
         Vec2::new(tuple.0, tuple.1)
@@ -460,7 +448,7 @@ where
 
 impl<T> Into<(T, T)> for Vec2<T>
 where
-    T: Zero + One + NumAssign + Copy,
+    T: NumAssign + Copy,
 {
     fn into(self) -> (T, T) {
         (self.x, self.y)

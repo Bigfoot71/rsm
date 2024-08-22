@@ -1,5 +1,5 @@
 use num_traits::{
-    Zero, One, NumAssign, Float
+    NumAssign, Float
 };
 
 use std::ops::{
@@ -27,7 +27,7 @@ pub struct Vec3<T> {
 
 impl<T> Vec3<T>
 where
-    T: Zero + One + NumAssign + Copy,
+    T: NumAssign + Copy,
 {
     pub fn new(x: T, y: T, z: T) -> Self {
         Self { x, y, z }
@@ -52,10 +52,7 @@ where
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-    pub fn cross(&self, other: &Self) -> Self
-    where
-        T: Mul<Output = T> + Sub<Output = T>,
-    {
+    pub fn cross(&self, other: &Self) -> Self {
         Self::new(
             self.y * other.z - self.z * other.y,
             self.z * other.x - self.x * other.z,
@@ -63,10 +60,7 @@ where
         )
     }
 
-    pub fn distance_squared(&self, other: &Self) -> T
-    where
-        T: Mul<Output = T> + Sub<Output = T>,
-    {
+    pub fn distance_squared(&self, other: &Self) -> T {
         (self.x - other.x) * (self.x - other.x) +
         (self.y - other.y) * (self.y - other.y) +
         (self.z - other.z) * (self.z - other.z)
@@ -75,7 +69,7 @@ where
 
 impl<T> Vec3<T>
 where
-    T: Float + Zero + One + NumAssign + Copy,
+    T: NumAssign + Float,
 {
     pub fn length(&self) -> T {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
@@ -140,7 +134,7 @@ where
 
 impl<T> From<(T, T, T)> for Vec3<T>
 where
-    T: Zero + One + NumAssign + Copy,
+    T: NumAssign + Copy,
 {
     fn from(tuple: (T, T, T)) -> Self {
         Vec3::new(tuple.0, tuple.1, tuple.2)
@@ -149,7 +143,7 @@ where
 
 impl<T> Into<(T, T, T)> for Vec3<T>
 where
-    T: Zero + One + NumAssign + Copy,
+    T: NumAssign + Copy,
 {
     fn into(self) -> (T, T, T) {
         (self.x, self.y, self.z)

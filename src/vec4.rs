@@ -1,5 +1,5 @@
 use num_traits::{
-    Zero, One, NumAssign, Float
+    NumAssign, Float
 };
 
 use std::ops::{
@@ -27,7 +27,7 @@ pub struct Vec4<T> {
 
 impl<T> Vec4<T>
 where
-    T: Zero + One + NumAssign + Copy,
+    T: NumAssign + Copy,
 {
     pub fn new(x: T, y: T, z: T, w: T) -> Self {
         Self { x, y, z, w }
@@ -45,17 +45,11 @@ where
         Self::new(T::one(), T::one(), T::one(), T::one())
     }
 
-    pub fn dot(&self, other: &Self) -> T
-    where
-        T: Mul<Output = T> + Add<Output = T>,
-    {
+    pub fn dot(&self, other: &Self) -> T {
         self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
     }
 
-    pub fn lerp(&self, other: &Self, t: T) -> Self
-    where
-        T: Add<Output = T> + Mul<Output = T> + Copy,
-    {
+    pub fn lerp(&self, other: &Self, t: T) -> Self {
         Self::new(
             self.x + t * (other.x - self.x),
             self.y + t * (other.y - self.y),
@@ -67,7 +61,7 @@ where
 
 impl<T> Vec4<T>
 where
-    T: Float + Zero + One + NumAssign + Copy,
+    T: NumAssign + Float,
 {
     pub fn length(&self) -> T {
         (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
@@ -94,7 +88,7 @@ where
 
 impl<T> From<(T, T, T, T)> for Vec4<T>
 where
-    T: Zero + One + NumAssign + Copy,
+    T: NumAssign + Copy,
 {
     fn from(tuple: (T, T, T, T)) -> Self {
         Vec4::new(tuple.0, tuple.1, tuple.2, tuple.3)
@@ -103,7 +97,7 @@ where
 
 impl<T> Into<(T, T, T, T)> for Vec4<T>
 where
-    T: Zero + One + NumAssign + Copy,
+    T: NumAssign + Copy,
 {
     fn into(self) -> (T, T, T, T) {
         (self.x, self.y, self.z, self.w)
