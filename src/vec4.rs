@@ -81,17 +81,18 @@ where
 
     #[inline]
     pub fn dot(&self, other: &Self) -> T {
-        self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
+        self.x * other.x +
+        self.y * other.y +
+        self.z * other.z +
+        self.w * other.w
     }
 
     #[inline]
-    pub fn lerp(&self, other: &Self, t: T) -> Self {
-        Self::new(
-            self.x + t * (other.x - self.x),
-            self.y + t * (other.y - self.y),
-            self.z + t * (other.z - self.z),
-            self.w + t * (other.w - self.w),
-        )
+    pub fn length_squared(&self) -> T {
+        self.x * self.x +
+        self.y * self.y +
+        self.z * self.z +
+        self.w * self.w
     }
 }
 
@@ -112,6 +113,16 @@ where
         } else {
             Some(Self::new(self.x / len, self.y / len, self.z / len, self.w / len))
         }
+    }
+
+    #[inline]
+    pub fn lerp(&self, other: &Self, t: T) -> Self {
+        Self::new(
+            self.x + t * (other.x - self.x),
+            self.y + t * (other.y - self.y),
+            self.z + t * (other.z - self.z),
+            self.w + t * (other.w - self.w),
+        )
     }
 }
 
@@ -191,7 +202,11 @@ where
 
     #[inline]
     fn add(self, other: Self) -> Self {
-        Self::new(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w)
+        Self::new(
+            self.x + other.x,
+            self.y + other.y,
+            self.z + other.z,
+            self.w + other.w)
     }
 }
 
@@ -203,7 +218,11 @@ where
 
     #[inline]
     fn add(self, scalar: T) -> Self {
-        Self::new(self.x + scalar, self.y + scalar, self.z + scalar, self.w + scalar)
+        Self::new(
+            self.x + scalar,
+            self.y + scalar,
+            self.z + scalar,
+            self.w + scalar)
     }
 }
 
@@ -215,7 +234,11 @@ where
 
     #[inline]
     fn sub(self, other: Self) -> Self {
-        Self::new(self.x - other.x, self.y - other.y, self.z - other.z, self.w - other.w)
+        Self::new(
+            self.x - other.x,
+            self.y - other.y,
+            self.z - other.z,
+            self.w - other.w)
     }
 }
 
@@ -227,7 +250,11 @@ where
 
     #[inline]
     fn sub(self, scalar: T) -> Self {
-        Self::new(self.x - scalar, self.y - scalar, self.z - scalar, self.w - scalar)
+        Self::new(
+            self.x - scalar,
+            self.y - scalar,
+            self.z - scalar,
+            self.w - scalar)
     }
 }
 
@@ -239,7 +266,11 @@ where
 
     #[inline]
     fn mul(self, other: Self) -> Self {
-        Self::new(self.x * other.x, self.y * other.y, self.z * other.z, self.w * other.w)
+        Self::new(
+            self.x * other.x,
+            self.y * other.y,
+            self.z * other.z,
+            self.w * other.w)
     }
 }
 
@@ -251,7 +282,11 @@ where
 
     #[inline]
     fn mul(self, scalar: T) -> Self {
-        Self::new(self.x * scalar, self.y * scalar, self.z * scalar, self.w * scalar)
+        Self::new(
+            self.x * scalar,
+            self.y * scalar,
+            self.z * scalar,
+            self.w * scalar)
     }
 }
 
@@ -263,7 +298,11 @@ where
 
     #[inline]
     fn div(self, other: Self) -> Self {
-        Self::new(self.x / other.x, self.y / other.y, self.z / other.z, self.w / other.w)
+        Self::new(
+            self.x / other.x,
+            self.y / other.y,
+            self.z / other.z,
+            self.w / other.w)
     }
 }
 
@@ -275,7 +314,11 @@ where
 
     #[inline]
     fn div(self, scalar: T) -> Self {
-        Self::new(self.x / scalar, self.y / scalar, self.z / scalar, self.w / scalar)
+        Self::new(
+            self.x / scalar,
+            self.y / scalar,
+            self.z / scalar,
+            self.w / scalar)
     }
 }
 

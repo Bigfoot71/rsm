@@ -80,10 +80,7 @@ where
     }
 
     #[inline]
-    pub fn dot(&self, other: &Self) -> T
-    where
-        T: Mul<Output = T> + Add<Output = T>,
-    {
+    pub fn dot(&self, other: &Self) -> T {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
@@ -94,6 +91,11 @@ where
             self.z * other.x - self.x * other.z,
             self.x * other.y - self.y * other.x,
         )
+    }
+
+    #[inline]
+    pub fn length_squared(&self) -> T {
+        self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     #[inline]

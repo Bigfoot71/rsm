@@ -231,6 +231,30 @@ where
         self.x * other.x + self.y * other.y
     }
 
+    /// Computes the squared length (or magnitude) of the vector.
+    ///
+    /// The squared length is calculated as the sum of the squares of the components of the vector.
+    /// This is often used in computations where you need the length of the vector but want to avoid
+    /// the overhead of computing the square root.
+    ///
+    /// # Returns
+    /// The squared length of the vector as a value of type `T`. This is the result of the expression
+    /// `x * x + y * y`.
+    ///
+    /// # Constraints
+    /// - `T` must implement the `Mul` and `Add` traits to support multiplication and addition operations.
+    ///
+    /// # Example
+    /// ```
+    /// let vec = Vec2::new(3.0, 4.0);
+    /// assert_eq!(vec.length_squared(), 25.0);
+    /// ```
+    /// 
+    #[inline]
+    pub fn length_squared(&self) -> T {
+        self.x * self.x + self.y * self.y
+    }
+
     /// Computes the squared distance between this vector and another vector.
     ///
     /// This method calculates the squared distance between the two vectors without computing the square root,
