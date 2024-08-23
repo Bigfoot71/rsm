@@ -14,6 +14,9 @@ use std::ops::{
 
 use std::fmt;
 
+use crate::vec3::Vec3;
+use crate::vec4::Vec4;
+
 /// Represents a 2D vector with generic numeric components.
 ///
 /// `Vec2` is a generic structure that represents a 2-dimensional vector with components `x` and `y`.
@@ -54,25 +57,6 @@ where
         Self { x, y }
     }
 
-    /// Creates a vector with both components set to the given value `v`.
-    ///
-    /// # Parameters
-    /// - `v`: The value to be assigned to both the x and y components of the vector.
-    ///
-    /// # Returns
-    /// A `Vec2` instance where both components are initialized to `v`.
-    ///
-    /// # Example
-    /// ```
-    /// let vec = Vec2::set(5.0);
-    /// assert_eq!(vec.x, 5.0);
-    /// assert_eq!(vec.y, 5.0);
-    /// ```
-    #[inline]
-    pub fn set(v: T) -> Self {
-        Self { x: v, y: v }
-    }
-
     /// Returns a vector with both components set to zero.
     ///
     /// This is commonly used to initialize or reset a vector to a zero state.
@@ -107,6 +91,72 @@ where
     #[inline]
     pub fn one() -> Self {
         Self::new(T::one(), T::one())
+    }
+
+    /// Creates a vector with both components set to the given value `v`.
+    ///
+    /// # Parameters
+    /// - `v`: The value to be assigned to both the x and y components of the vector.
+    ///
+    /// # Returns
+    /// A `Vec2` instance where both components are initialized to `v`.
+    ///
+    /// # Example
+    /// ```
+    /// let vec = Vec2::set(5.0);
+    /// assert_eq!(vec.x, 5.0);
+    /// assert_eq!(vec.y, 5.0);
+    /// ```
+    #[inline]
+    pub fn set(v: T) -> Self {
+        Self { x: v, y: v }
+    }
+
+    /// Creates a `Vec2` from a `Vec3` by using the `x` and `y` components of the `Vec3`.
+    ///
+    /// This is useful when you want to convert a 3-dimensional vector to a 2-dimensional vector,
+    /// discarding the `z` component.
+    ///
+    /// # Parameters
+    /// - `v`: A reference to a `Vec3` instance from which the `x` and `y` components will be used.
+    ///
+    /// # Returns
+    /// A `Vec2` instance with the `x` and `y` components taken from the `Vec3` instance.
+    ///
+    /// # Example
+    /// ```
+    /// let vec3 = Vec3::new(1.0, 2.0, 3.0);
+    /// let vec2 = Vec2::from_vec3(&vec3);
+    /// assert_eq!(vec2.x, 1.0);
+    /// assert_eq!(vec2.y, 2.0);
+    /// ```
+    /// 
+    #[inline]
+    pub fn from_vec3(v: &Vec3<T>) -> Self {
+        Self::new(v.x, v.y)
+    }
+
+    /// Creates a `Vec2` from a `Vec4` by using the `x` and `y` components of the `Vec4`.
+    ///
+    /// This is useful when you want to convert a 4-dimensional vector to a 2-dimensional vector,
+    /// discarding the `z` and `w` components.
+    ///
+    /// # Parameters
+    /// - `v`: A reference to a `Vec4` instance from which the `x` and `y` components will be used.
+    ///
+    /// # Returns
+    /// A `Vec2` instance with the `x` and `y` components taken from the `Vec4` instance.
+    ///
+    /// # Example
+    /// ```
+    /// let vec4 = Vec4::new(1.0, 2.0, 3.0, 4.0);
+    /// let vec2 = Vec2::from_vec4(&vec4);
+    /// assert_eq!(vec2.x, 1.0);
+    /// assert_eq!(vec2.y, 2.0);
+    /// ```
+    #[inline]
+    pub fn from_vec4(v: &Vec4<T>) -> Self {
+        Self::new(v.x, v.y)
     }
 
     /// Returns an iterator over the elements of the vector.

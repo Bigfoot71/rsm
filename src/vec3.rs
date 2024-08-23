@@ -14,6 +14,9 @@ use std::ops::{
 
 use std::fmt;
 
+use crate::vec2::Vec2;
+use crate::vec4::Vec4;
+
 /// Represents a 3D vector with generic numeric components.
 ///
 /// `Vec3` is a generic structure that represents a 3-dimensional vector with components `x`, `y`, and `z`.
@@ -40,11 +43,6 @@ where
     }
 
     #[inline]
-    pub fn set(v: T) -> Self {
-        Self { x: v, y: v, z: v }
-    }
-
-    #[inline]
     pub fn zero() -> Self {
         Self::new(T::zero(), T::zero(), T::zero())
     }
@@ -52,6 +50,21 @@ where
     #[inline]
     pub fn one() -> Self {
         Self::new(T::one(), T::one(), T::one())
+    }
+
+    #[inline]
+    pub fn set(v: T) -> Self {
+        Self::new(v, v, v)
+    }
+
+    #[inline]
+    pub fn from_vec2(v: &Vec2<T>) -> Self {
+        Self::new(v.x, v.y, T::zero())
+    }
+
+    #[inline]
+    pub fn from_vec4(v: &Vec4<T>) -> Self {
+        Self::new(v.x, v.y, v.z)
     }
 
     #[inline]
