@@ -510,7 +510,7 @@ where
     #[inline]
     pub fn reflect(&self, normal: &Self) -> Self {
         let dot = self.x * normal.x + self.y * normal.y;
-        let two = T::one() + T::one(); // Calculate 2.0 as T::one() + T::one()
+        let two = T::from(2.0).unwrap();
 
         Self::new(
             self.x - (two * normal.x) * dot,
