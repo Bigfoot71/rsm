@@ -36,10 +36,10 @@ where
     #[inline]
     pub fn zero() -> Self {
         Self (
-            Vec4::new(T::zero(), T::zero(), T::zero(), T::zero()),
-            Vec4::new(T::zero(), T::zero(), T::zero(), T::zero()),
-            Vec4::new(T::zero(), T::zero(), T::zero(), T::zero()),
-            Vec4::new(T::zero(), T::zero(), T::zero(), T::zero()),
+            Vec4::zero(),
+            Vec4::zero(),
+            Vec4::zero(),
+            Vec4::zero(),
         )
     }
 
