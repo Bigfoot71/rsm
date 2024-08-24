@@ -40,13 +40,16 @@ where
     /// Creates a new vector with the given `x` and `y` components.
     ///
     /// # Parameters
+    ///
     /// - `x`: The x-coordinate of the vector.
     /// - `y`: The y-coordinate of the vector.
     ///
     /// # Returns
+    ///
     /// A `Vec2` instance with the specified `x` and `y` components.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec = Vec2::new(3.0, 4.0);
     /// assert_eq!(vec.x, 3.0);
@@ -62,9 +65,11 @@ where
     /// This is commonly used to initialize or reset a vector to a zero state.
     ///
     /// # Returns
+    ///
     /// A `Vec2` instance where both components are zero.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec = Vec2::zero();
     /// assert_eq!(vec.x, 0.0);
@@ -80,9 +85,11 @@ where
     /// This is useful for initializing or scaling vectors to a unit state.
     ///
     /// # Returns
+    ///
     /// A `Vec2` instance where both components are one.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec = Vec2::one();
     /// assert_eq!(vec.x, 1.0);
@@ -96,12 +103,15 @@ where
     /// Creates a vector with both components set to the given value `v`.
     ///
     /// # Parameters
+    ///
     /// - `v`: The value to be assigned to both the x and y components of the vector.
     ///
     /// # Returns
+    ///
     /// A `Vec2` instance where both components are initialized to `v`.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec = Vec2::set(5.0);
     /// assert_eq!(vec.x, 5.0);
@@ -118,12 +128,15 @@ where
     /// discarding the `z` component.
     ///
     /// # Parameters
+    ///
     /// - `v`: A reference to a `Vec3` instance from which the `x` and `y` components will be used.
     ///
     /// # Returns
+    ///
     /// A `Vec2` instance with the `x` and `y` components taken from the `Vec3` instance.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec3 = Vec3::new(1.0, 2.0, 3.0);
     /// let vec2 = Vec2::from_vec3(&vec3);
@@ -142,12 +155,15 @@ where
     /// discarding the `z` and `w` components.
     ///
     /// # Parameters
+    ///
     /// - `v`: A reference to a `Vec4` instance from which the `x` and `y` components will be used.
     ///
     /// # Returns
+    ///
     /// A `Vec2` instance with the `x` and `y` components taken from the `Vec4` instance.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec4 = Vec4::new(1.0, 2.0, 3.0, 4.0);
     /// let vec2 = Vec2::from_vec4(&vec4);
@@ -165,9 +181,11 @@ where
     /// in a read-only manner, providing immutable references to the elements.
     ///
     /// # Returns
+    ///
     /// An iterator of type `Iter<'_, T>` over the vector's components.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec = Vec3::new(1.0, 2.0, 3.0);
     /// let mut sum = 0.0;
@@ -188,9 +206,11 @@ where
     /// and modify them in place.
     ///
     /// # Returns
+    ///
     /// A mutable iterator of type `IterMut<'_, T>` over the vector's components.
     ///
     /// # Example
+    ///
     /// ```
     /// let mut vec = Vec3::new(1.0, 2.0, 3.0);
     /// for component in vec.iter_mut() {
@@ -212,15 +232,19 @@ where
     /// It is a measure of how much one vector extends in the direction of another. The result is a scalar value.
     ///
     /// # Arguments
+    ///
     /// - `other`: The other vector with which to compute the dot product.
     ///
     /// # Returns
+    ///
     /// The dot product of the two vectors as a value of type `T`.
     ///
     /// # Constraints
+    ///
     /// - `T` must implement the `Mul` and `Add` traits to support multiplication and addition operations.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec1 = Vec2::new(1.0, 2.0);
     /// let vec2 = Vec2::new(3.0, 4.0);
@@ -238,13 +262,16 @@ where
     /// the overhead of computing the square root.
     ///
     /// # Returns
+    ///
     /// The squared length of the vector as a value of type `T`. This is the result of the expression
     /// `x * x + y * y`.
     ///
     /// # Constraints
+    ///
     /// - `T` must implement the `Mul` and `Add` traits to support multiplication and addition operations.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec = Vec2::new(3.0, 4.0);
     /// assert_eq!(vec.length_squared(), 25.0);
@@ -261,15 +288,18 @@ where
     /// which can be more efficient, especially when comparing distances or performing multiple distance calculations.
     ///
     /// # Arguments
+    ///
     /// - `other`: The other vector to which the squared distance is calculated.
     ///
     /// # Returns
     /// The squared distance between the two vectors as a value of type `T`.
     ///
     /// # Constraints
+    ///
     /// - `T` must implement the `Sub` and `Mul` traits to support subtraction and multiplication operations.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec1 = Vec2::new(1.0, 2.0);
     /// let vec2 = Vec2::new(4.0, 6.0);
@@ -284,6 +314,106 @@ where
 
 impl<T> Vec2<T>
 where
+    T: NumAssign + Copy + PartialOrd,
+{
+    /// Returns a new `Vec2` containing the component-wise minimum of `self` and `other`.
+    ///
+    /// For each component `x` and `y`, the method compares the corresponding components of 
+    /// `self` and `other` and returns the smaller of the two.
+    ///
+    /// # Parameters
+    ///
+    /// - `other`: A reference to another `Vec2` instance to compare with `self`.
+    ///
+    /// # Returns
+    ///
+    /// A new `Vec2` where each component is the minimum value between `self` and `other`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let vec1 = Vec2::new(3, 7);
+    /// let vec2 = Vec2::new(4, 5);
+    /// let min_vec = vec1.min(&vec2);
+    /// assert_eq!(min_vec, Vec2::new(3, 5));
+    /// ```
+    #[inline]
+    pub fn min(&self, other: &Self) -> Self {
+        Self::new(
+            if self.x < other.x { self.x } else { other.x },
+            if self.y < other.y { self.y } else { other.y }
+        )
+    }
+
+    /// Returns a new `Vec2` containing the component-wise maximum of `self` and `other`.
+    ///
+    /// For each component `x` and `y`, the method compares the corresponding components of 
+    /// `self` and `other` and returns the larger of the two.
+    ///
+    /// # Parameters
+    ///
+    /// - `other`: A reference to another `Vec2` instance to compare with `self`.
+    ///
+    /// # Returns
+    ///
+    /// A new `Vec2` where each component is the maximum value between `self` and `other`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let vec1 = Vec2::new(3, 7);
+    /// let vec2 = Vec2::new(4, 5);
+    /// let max_vec = vec1.max(&vec2);
+    /// assert_eq!(max_vec, Vec2::new(4, 7));
+    /// ```
+    #[inline]
+    pub fn max(&self, other: &Self) -> Self {
+        Self::new(
+            if self.x > other.x { self.x } else { other.x },
+            if self.y > other.y { self.y } else { other.y }
+        )
+    }
+
+    /// Clamps the components of `self` to lie within the inclusive range defined by `min` and `max`.
+    ///
+    /// For each component `x` and `y`, the method compares the corresponding component of `self`
+    /// to the provided `min` and `max` values and ensures it lies within this range. If a component
+    /// of `self` is less than the corresponding component of `min`, it is set to the `min` value. 
+    /// If it is greater than the corresponding component of `max`, it is set to the `max` value.
+    ///
+    /// # Parameters
+    ///
+    /// - `min`: A reference to a `Vec2` representing the minimum allowed values for each component.
+    /// - `max`: A reference to a `Vec2` representing the maximum allowed values for each component.
+    ///
+    /// # Returns
+    ///
+    /// A new `Vec2` where each component is clamped to the range `[min, max]`.
+    ///
+    /// # Panics
+    ///
+    /// This method will panic if any component of `min` is greater than the corresponding component
+    /// of `max`, as it is not possible to clamp a value within an invalid range.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let vec = Vec2::new(5, 10);
+    /// let min_vec = Vec2::new(3, 7);
+    /// let max_vec = Vec2::new(6, 8);
+    /// let clamped_vec = vec.clamp(&min_vec, &max_vec);
+    /// assert_eq!(clamped_vec, Vec2::new(5, 8));
+    /// ```
+    pub fn clamp(&self, min: &Self, max: &Self) -> Self {
+        Self::new(
+            if self.x < min.x { min.x } else if self.x > max.x { max.x } else { self.x },
+            if self.y < min.y { min.y } else if self.y > max.y { max.y } else { self.y }
+        )
+    }
+}
+
+impl<T> Vec2<T>
+where
     T: NumAssign + Float,
 {
     /// Returns the length (magnitude) of the vector.
@@ -292,12 +422,15 @@ where
     /// the sum of the squares of its components.
     ///
     /// # Returns
+    ///
     /// The length (magnitude) of the vector as a value of type `T`.
     ///
     /// # Constraints
+    ///
     /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec = Vec2::new(3.0, 4.0);
     /// assert_eq!(vec.length(), 5.0);
@@ -314,13 +447,16 @@ where
     /// If the vector has zero length (is a zero vector), `None` is returned to indicate that normalization is not possible.
     ///
     /// # Returns
+    ///
     /// - `Some(Self)`: A new vector with unit length pointing in the same direction as the original vector, if normalization is possible.
     /// - `None`: If the vector has zero length, indicating that it cannot be normalized.
     ///
     /// # Constraints
+    ///
     /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec = Vec2::new(3.0, 4.0);
     /// let normalized = vec.normalize().unwrap();
@@ -342,15 +478,19 @@ where
     /// representing the difference between them.
     ///
     /// # Arguments
+    ///
     /// - `other`: The other vector to which the distance is calculated.
     ///
     /// # Returns
+    ///
     /// The distance between the two vectors as a value of type `T`.
     ///
     /// # Constraints
+    ///
     /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec1 = Vec2::new(1.0, 2.0);
     /// let vec2 = Vec2::new(4.0, 6.0);
@@ -371,17 +511,21 @@ where
     /// resulting in a zero-length vector, `None` is returned.
     ///
     /// # Arguments
+    ///
     /// - `other`: The target vector to which the direction is calculated.
     ///
     /// # Returns
+    ///
     /// An `Option<Self>` where:
     /// - `Some(Self)` contains the normalized direction vector pointing from `self` to `other` if the vectors are not identical.
     /// - `None` if `self` and `other` are identical (i.e., the direction vector has zero length).
     ///
     /// # Constraints
+    ///
     /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec1 = Vec2::new(1.0, 2.0);
     /// let vec2 = Vec2::new(4.0, 6.0);
@@ -406,15 +550,19 @@ where
     /// and dot product of the vectors. The result is in radians, and the angle is measured counterclockwise.
     ///
     /// # Arguments
+    ///
     /// - `other`: The other vector to which the angle is computed.
     ///
     /// # Returns
+    ///
     /// The angle between the vectors as a value of type `T`.
     ///
     /// # Constraints
+    ///
     /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
     ///
     /// # Example
+    ///
     /// ```
     /// let vec1 = Vec2::new(1.0, 0.0);
     /// let vec2 = Vec2::new(0.0, 1.0);
@@ -434,15 +582,19 @@ where
     /// and the result is in radians. The direction is clockwise from the positive x-axis.
     ///
     /// # Arguments
+    ///
     /// - `end`: The end point of the line segment from `self` to `end`.
     ///
     /// # Returns
+    ///
     /// The angle of the line segment as a value of type `T`.
     ///
     /// # Constraints
+    ///
     /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
     ///
     /// # Example
+    ///
     /// ```
     /// let start = Vec2::new(1.0, 1.0);
     /// let end = Vec2::new(4.0, 3.0);
@@ -462,16 +614,20 @@ where
     /// between `0.0` and `1.0`, the result is a point between `self` and `other` on the line segment connecting them.
     ///
     /// # Arguments
+    ///
     /// - `other`: The vector to interpolate towards.
     /// - `t`: The interpolation factor, where `t` ranges from `0.0` to `1.0`.
     ///
     /// # Returns
+    ///
     /// A new vector representing the point that is linearly interpolated between `self` and `other`.
     ///
     /// # Constraints
+    ///
     /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
     ///
     /// # Example
+    ///
     /// ```
     /// let start = Vec2::new(0.0, 0.0);
     /// let end = Vec2::new(10.0, 10.0);
@@ -492,15 +648,19 @@ where
     /// where `self · normal` is the dot product between `self` and `normal`.
     ///
     /// # Parameters
+    ///
     /// - `normal`: The normal vector around which to reflect. This vector should be normalized.
     ///
     /// # Returns
+    ///
     /// A new vector representing the reflection of `self` around `normal`.
     ///
     /// # Constraints
+    ///
     /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
     ///
     /// # Example
+    ///
     /// ```
     /// let incident = Vec2::new(1.0, -1.0);
     /// let normal = Vec2::new(0.0, 1.0).normalize().unwrap(); // Normalized normal vector
@@ -524,18 +684,22 @@ where
     /// the normal vector of the surface, and the ratio of the refractive indices of the two media.
     ///
     /// # Parameters
+    ///
     /// - `normal`: The normalized normal vector of the interface between two optical media.
     /// - `r`: The ratio of the refractive index of the medium from where the ray comes
     ///         to the refractive index of the medium on the other side of the surface.
     ///
     /// # Returns
+    ///
     /// An `Option<Self>`. Returns `Some(Self)` with the direction of the refracted ray if refraction is possible,
     /// or `None` if refraction is not possible (e.g., due to total internal reflection).
     ///
     /// # Constraints
+    ///
     /// - `T` must implement the `Float` trait, which provides methods for floating-point arithmetic.
     ///
     /// # Notes
+    ///
     /// - The incoming ray and the normal vector should be normalized.
     /// - The result will be `None` if total internal reflection occurs (i.e., `d < 0`).
     #[inline]

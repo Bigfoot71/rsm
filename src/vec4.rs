@@ -98,6 +98,40 @@ where
 
 impl<T> Vec4<T>
 where
+    T: NumAssign + Copy + PartialOrd,
+{
+    #[inline]
+    pub fn min(&self, other: &Self) -> Self {
+        Self::new(
+            if self.x < other.x { self.x } else { other.x },
+            if self.y < other.y { self.y } else { other.y },
+            if self.z < other.z { self.z } else { other.z },
+            if self.w < other.w { self.w } else { other.w }
+        )
+    }
+
+    #[inline]
+    pub fn max(&self, other: &Self) -> Self {
+        Self::new(
+            if self.x > other.x { self.x } else { other.x },
+            if self.y > other.y { self.y } else { other.y },
+            if self.z > other.z { self.z } else { other.z },
+            if self.w > other.w { self.w } else { other.w }
+        )
+    }
+
+    pub fn clamp(&self, min: &Self, max: &Self) -> Self {
+        Self::new(
+            if self.x < min.x { min.x } else if self.x > max.x { max.x } else { self.x },
+            if self.y < min.y { min.y } else if self.y > max.y { max.y } else { self.y },
+            if self.z < min.z { min.z } else if self.z > max.z { max.z } else { self.z },
+            if self.w < min.w { min.w } else if self.w > max.w { max.w } else { self.w }
+        )
+    }
+}
+
+impl<T> Vec4<T>
+where
     T: NumAssign + Float,
 {
     #[inline]
