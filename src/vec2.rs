@@ -404,6 +404,7 @@ where
     /// let clamped_vec = vec.clamp(&min_vec, &max_vec);
     /// assert_eq!(clamped_vec, Vec2::new(5, 8));
     /// ```
+    #[inline]
     pub fn clamp(&self, min: &Self, max: &Self) -> Self {
         Self::new(
             if self.x < min.x { min.x } else if self.x > max.x { max.x } else { self.x },

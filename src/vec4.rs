@@ -120,6 +120,7 @@ where
         )
     }
 
+    #[inline]
     pub fn clamp(&self, min: &Self, max: &Self) -> Self {
         Self::new(
             if self.x < min.x { min.x } else if self.x > max.x { max.x } else { self.x },
