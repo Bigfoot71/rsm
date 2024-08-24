@@ -1,5 +1,5 @@
 use num_traits::{
-    NumAssign, Float
+    NumAssign, Signed, Float
 };
 
 use std::slice::{
@@ -139,6 +139,30 @@ where
 
 impl<T> Vec3<T>
 where
+    T: NumAssign + Signed + Copy + PartialOrd
+{
+    pub fn perpendicular(&self) -> Self {
+        let mut min = self.x.abs();
+        let mut cardinal_axis = Self::new(
+            T::one(), T::zero(), T::zero());
+
+        if self.y.abs() < min {
+            min = self.y.abs();
+            cardinal_axis = Self::new(
+                T::zero(), T::one(), T::zero());
+        }
+
+        if self.z.abs() < min {
+            cardinal_axis = Self::new(
+                T::zero(), T::zero(), T::one());
+        }
+
+        self.cross(&cardinal_axis)
+    }
+}
+
+impl<T> Vec3<T>
+where
     T: NumAssign + Float,
 {
     #[inline]
@@ -187,6 +211,55 @@ where
         let dot = self.dot(other);
 
         len_cross.atan2(dot)
+    }
+
+    #[inline]
+    pub fn project(&self, other: &Self) -> Self {
+        let s_dot_o = self.dot(other);
+        let o_dot_o = other.dot(other);
+        let mag = s_dot_o / o_dot_o;
+        *other * mag
+    }
+
+    #[inline]
+    pub fn reject(&self, other: &Self) -> Self {
+        let s_dot_o = self.dot(other);
+        let o_dot_o = other.dot(other);
+        let mag = s_dot_o / o_dot_o;
+        *self - (*other * mag)
+    }
+
+    #[inline]
+    pub fn ortho_normalize(&mut self, other: &mut Self) {
+        if let Some(n_s) = self.normalize() {
+            *self = n_s;
+        }
+        let mut c_so: Vec3<T> = self.cross(other);
+        if let Some(nc_so) = c_so.normalize() {
+            c_so = nc_so;
+        }
+        *other = c_so.cross(self);
+    }
+
+    #[inline]
+    pub fn rotate_by_axis(&self, mut axis: Self, angle: T) -> Self {
+        if let Some(n_axis) = axis.normalize() {
+            axis = n_axis;
+        }
+
+        let two = T::from(2.0).unwrap();
+        let w = axis * (angle / two).sin();
+
+        let ws1 = w.cross(self);
+        let ws2 = w.cross(&ws1);
+
+        *self + (ws1 * two * angle.cos()) + (ws2 * two)
+    }
+
+    #[inline]
+    pub fn reflect(&self, normal: &Self) -> Self {
+        let two = T::from(2.0).unwrap();
+        *self - (*normal * two) * self.dot(normal)
     }
 
     #[inline]
