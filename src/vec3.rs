@@ -16,6 +16,8 @@ use std::fmt;
 
 use crate::vec2::Vec2;
 use crate::vec4::Vec4;
+use crate::mat3::Mat3;
+use crate::mat4::Mat4;
 
 /// Represents a 3D vector with generic numeric components.
 ///
@@ -103,6 +105,22 @@ where
         (self.x - other.x) * (self.x - other.x) +
         (self.y - other.y) * (self.y - other.y) +
         (self.z - other.z) * (self.z - other.z)
+    }
+
+    #[inline]
+    pub fn transform_mat3(&self, transform: &Mat3<T>) -> Self {
+        let x = transform.0.x * self.x + transform.1.x * self.y + transform.2.x * self.z;
+        let y = transform.0.y * self.x + transform.1.y * self.y + transform.2.y * self.z;
+        let z = transform.0.z * self.x + transform.1.z * self.y + transform.2.z * self.z;
+        Self::new(x, y, z)
+    }
+
+    #[inline]
+    pub fn transform_mat4(&self, transform: &Mat4<T>) -> Self {
+        let x = transform.0.x * self.x + transform.1.x * self.y + transform.2.x * self.z + transform.3.x;
+        let y = transform.0.y * self.x + transform.1.y * self.y + transform.2.y * self.z + transform.3.y;
+        let z = transform.0.z * self.x + transform.1.z * self.y + transform.2.z * self.z + transform.3.z;
+        Self::new(x, y, z)
     }
 }
 

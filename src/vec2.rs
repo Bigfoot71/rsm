@@ -16,6 +16,8 @@ use std::fmt;
 
 use crate::vec3::Vec3;
 use crate::vec4::Vec4;
+use crate::mat2::Mat2;
+use crate::mat3::Mat3;
 
 /// Represents a 2D vector with generic numeric components.
 ///
@@ -292,6 +294,7 @@ where
     /// - `other`: The other vector to which the squared distance is calculated.
     ///
     /// # Returns
+    ///
     /// The squared distance between the two vectors as a value of type `T`.
     ///
     /// # Constraints
@@ -309,6 +312,95 @@ where
     pub fn distance_squared(&self, other: &Self) -> T {
         (self.x - other.x) * (self.x - other.x) +
         (self.y - other.y) * (self.y - other.y)
+    }
+
+    /// Transforms a 2D vector using a 2x2 matrix.
+    ///
+    /// This method applies a 2D affine transformation to a `Vec2<T>` using a `Mat2<T>` matrix.
+    /// The matrix multiplication is performed as follows:
+    ///
+    /// ```text
+    /// [ x' ] = [ m00  m01 ] [ x ] = [ m00 * x + m01 * y ]
+    /// [ y' ]   [ m10  m11 ] [ y ]   [ m10 * x + m11 * y ]
+    /// ```
+    ///
+    /// where `Vec2<T>` is represented as `[x, y]` and `Mat2<T>` is represented as:
+    ///
+    /// ```text
+    /// [ m00  m01 ]
+    /// [ m10  m11 ]
+    /// ```
+    ///
+    /// Parameters:
+    ///
+    /// - `transform`: A reference to a `Mat2<T>` matrix representing the 2D transformation to be applied.
+    ///
+    /// Returns:
+    /// - A new `Vec2<T>` that is the result of transforming the original vector by the matrix.
+    ///
+    /// Example:
+    /// ```
+    /// let vec = Vec2::new(1.0, 2.0);
+    /// let mat = Mat2::new(&Vec2::new(1.0, 0.0), &Vec2::new(0.0, 1.0));
+    /// let transformed_vec = vec.transform_mat2(&mat);
+    /// assert_eq!(transformed_vec, Vec2::new(1.0, 2.0));
+    /// ```
+    ///
+    /// This example shows a simple case where the matrix is the identity matrix, and hence
+    /// the vector remains unchanged.
+    #[inline]
+    pub fn transform_mat2(&self, transform: &Mat2<T>) -> Self {
+        let x = transform.0.x * self.x + transform.1.x * self.y;
+        let y = transform.0.y * self.x + transform.1.y * self.y;
+        Self::new(x, y)
+    }
+
+    /// Transforms a 2D vector using a 3x3 matrix.
+    ///
+    /// This method applies a 2D affine transformation to a `Vec2<T>` using a `Mat3<T>` matrix.
+    /// The matrix multiplication is performed as follows:
+    ///
+    /// ```text
+    /// [ x' ] = [ m00  m01  m02 ] [ x ] = [ m00 * x + m01 * y + m02 ]
+    /// [ y' ]   [ m10  m11  m12 ] [ y ]   [ m10 * x + m11 * y + m12 ]
+    /// [ w' ]   [ 0    0    1  ] [ 1 ]   [ 1 ] // Homogeneous coordinate
+    /// ```
+    ///
+    /// where `Vec2<T>` is represented as `[x, y]` and `Mat3<T>` is represented as:
+    ///
+    /// ```text
+    /// [ m00  m01  m02 ]
+    /// [ m10  m11  m12 ]
+    /// [ 0    0    1  ]
+    /// ```
+    ///
+    /// Parameters:
+    ///
+    /// - `transform`: A reference to a `Mat3<T>` matrix representing the 2D affine transformation to be applied.
+    ///
+    /// Returns:
+    ///
+    /// - A new `Vec2<T>` that is the result of transforming the original vector by the matrix.
+    ///
+    /// Example:
+    /// ```
+    /// let vec = Vec2::new(1.0, 2.0);
+    /// let mat = Mat3::new(
+    ///     Vec3::new(1.0, 0.0, 3.0), // Translation x
+    ///     Vec3::new(0.0, 1.0, 4.0), // Translation y
+    ///     Vec3::new(0.0, 0.0, 1.0)  // Homogeneous coordinate
+    /// );
+    /// let transformed_vec = vec.transform_mat3(&mat);
+    /// assert_eq!(transformed_vec, Vec2::new(4.0, 6.0));
+    /// ```
+    ///
+    /// In this example, the `Mat3` matrix represents a translation, moving the vector `(1.0, 2.0)`
+    /// to `(4.0, 6.0)`.
+    #[inline]
+    pub fn transform_mat3(&self, transform: &Mat3<T>) -> Self {
+        let x = transform.0.x * self.x + transform.1.x * self.y + transform.2.x;
+        let y = transform.0.y * self.x + transform.1.y * self.y + transform.2.y;
+        Self::new(x, y)
     }
 }
 

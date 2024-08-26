@@ -16,6 +16,7 @@ use std::fmt;
 
 use crate::vec2::Vec2;
 use crate::vec3::Vec3;
+use crate::mat4::Mat4;
 
 /// Represents a 4D vector with generic numeric components.
 ///
@@ -93,6 +94,15 @@ where
         self.y * self.y +
         self.z * self.z +
         self.w * self.w
+    }
+
+    #[inline]
+    pub fn transform(&self, transform: &Mat4<T>) -> Self {
+        let x = transform.0.x * self.x + transform.1.x * self.y + transform.2.x * self.z + transform.3.x * self.w;
+        let y = transform.0.y * self.x + transform.1.y * self.y + transform.2.y * self.z + transform.3.y * self.w;
+        let z = transform.0.z * self.x + transform.1.z * self.y + transform.2.z * self.z + transform.3.z * self.w;
+        let w = transform.0.w * self.x + transform.1.w * self.y + transform.2.w * self.z + transform.3.w * self.w;
+        Self::new(x, y, z, w)
     }
 }
 
