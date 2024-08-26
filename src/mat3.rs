@@ -18,9 +18,9 @@ use std::fmt;
 
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct Mat3<T> (
-    Vec3<T>,
-    Vec3<T>,
-    Vec3<T>
+    pub Vec3<T>,
+    pub Vec3<T>,
+    pub Vec3<T>
 );
 
 impl<T> Mat3<T>

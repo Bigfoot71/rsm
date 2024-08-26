@@ -17,8 +17,8 @@ use std::fmt;
 
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct Mat2<T> (
-    Vec2<T>,
-    Vec2<T>,
+    pub Vec2<T>,
+    pub Vec2<T>,
 );
 
 impl<T> Mat2<T>

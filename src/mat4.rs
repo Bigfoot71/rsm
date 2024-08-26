@@ -18,10 +18,10 @@ use std::fmt;
 
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct Mat4<T> (
-    Vec4<T>,
-    Vec4<T>,
-    Vec4<T>,
-    Vec4<T>
+    pub Vec4<T>,
+    pub Vec4<T>,
+    pub Vec4<T>,
+    pub Vec4<T>
 );
 
 impl<T> Mat4<T>
