@@ -55,26 +55,6 @@ where
     }
 
     #[inline]
-    pub fn translate(translate: &Vec3<T>) -> Self {
-        Self (
-            Vec4::new(T::one(), T::zero(), T::zero(), T::zero()),
-            Vec4::new(T::zero(), T::one(), T::zero(), T::zero()),
-            Vec4::new(T::zero(), T::zero(), T::one(), T::zero()),
-            Vec4::new(translate.x, translate.y, translate.z, T::one()),
-        )
-    }
-
-    #[inline]
-    pub fn scale(scale: &Vec3<T>) -> Self {
-        Self (
-            Vec4::new(scale.x, T::zero(), T::zero(), T::zero()),
-            Vec4::new(T::zero(), scale.y, T::zero(), T::zero()),
-            Vec4::new(T::zero(), T::zero(), scale.z, T::zero()),
-            Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
-        )
-    }
-
-    #[inline]
     pub fn transpose(&self) -> Self {
         Self (
             Vec4::new(self.0.x, self.1.x, self.2.x, self.3.x),
@@ -168,6 +148,21 @@ where
         );
         Self::new(&col0, &col1, &col2, &col3)
     }
+
+    #[inline]
+    pub fn translate(&mut self, translate: &Vec3<T>) {
+        self.0.w += translate.x;
+        self.1.w += translate.y;
+        self.2.w += translate.z;
+    }
+
+    #[inline]
+    pub fn scale(&mut self, scale: &Vec3<T>) {
+        self.0.x *= scale.x;
+        self.1.y *= scale.y;
+        self.2.z *= scale.z;
+    }
+    
 }
 
 impl<T> Mat4<T>
@@ -239,100 +234,124 @@ where
         )
     }
 
-    pub fn rotate(mut axis: Vec3<T>, angle: T) -> Self {
+    pub fn rotate(&mut self, mut axis: Vec3<T>, angle: T) {
         let len_sq = axis.length_squared();
-        if !(len_sq.is_one() || len_sq.is_zero())
-        {
+        if !(len_sq.is_one() || len_sq.is_zero()) {
             let inv_len = len_sq.sqrt();
             axis *= inv_len;
         }
+    
         let s = angle.sin();
         let c = angle.cos();
         let t = T::one() - c;
-        Self (
-            Vec4::<T>::new(
-                axis.x * axis.x * t + c,
-                axis.y * axis.x * t + axis.z * s,
-                axis.z * axis.x * t - axis.y * s,
-                T::zero()
-            ),
-            Vec4::<T>::new(
-                axis.x * axis.y * t - axis.z * s,
-                axis.y * axis.y * t + c,
-                axis.z * axis.y * t + axis.x * s,
-                T::zero()
-            ),
-            Vec4::<T>::new(
-                axis.x * axis.z * t + axis.y * s,
-                axis.y * axis.z * t - axis.x * s,
-                axis.z * axis.z * t + c,
-                T::zero()
-            ),
-            Vec4::<T>::zero()
-        )
+
+        let m00 = axis.x * axis.x * t + c;
+        let m01 = axis.y * axis.x * t + axis.z * s;
+        let m02 = axis.z * axis.x * t - axis.y * s;
+    
+        let m10 = axis.x * axis.y * t - axis.z * s;
+        let m11 = axis.y * axis.y * t + c;
+        let m12 = axis.z * axis.y * t + axis.x * s;
+    
+        let m20 = axis.x * axis.z * t + axis.y * s;
+        let m21 = axis.y * axis.z * t - axis.x * s;
+        let m22 = axis.z * axis.z * t + c;
+
+        for i in 0..3 {
+            let x = self[i][0];
+            let y = self[i][1];
+            let z = self[i][2];
+            self[i][0] = x * m00 + y * m10 + z * m20;
+            self[i][1] = x * m01 + y * m11 + z * m21;
+            self[i][2] = x * m02 + y * m12 + z * m22;
+        }
     }
 
-    pub fn rotate_x(angle: T) -> Self {
+    pub fn rotate_x(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
-        Self (
-            Vec4::new(T::one(), T::zero(), T::zero(), T::zero()),
-            Vec4::new(T::zero(), c, s, T::zero()),
-            Vec4::new(T::zero(), -s, c, T::zero()),
-            Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
-        )
+        for i in 0..3 {
+            let y = self[i][1];
+            let z = self[i][2];
+            self[i][1] = y * c - z * s;
+            self[i][2] = y * s + z * c;
+        }
     }
 
-    pub fn rotate_y(angle: T) -> Self {
+    pub fn rotate_y(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
-        Self (
-            Vec4::new(c, T::zero(), -s, T::zero()),
-            Vec4::new(T::zero(), T::one(), T::zero(), T::zero()),
-            Vec4::new(s, T::zero(), c, T::zero()),
-            Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
-        )
+        for i in 0..3 {
+            let x = self[i][0];
+            let z = self[i][2];
+            self[i][0] = x * c + z * s;
+            self[i][2] = -x * s + z * c;
+        }
     }
 
-    pub fn rotate_z(angle: T) -> Self {
+    pub fn rotate_z(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
-        Self (
-            Vec4::new(c, s, T::zero(), T::zero()),
-            Vec4::new(-s, c, T::zero(), T::zero()),
-            Vec4::new(T::zero(), T::zero(), T::one(), T::zero()),
-            Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
-        )
+        for i in 0..3 {
+            let x = self[i][0];
+            let y = self[i][1];
+            self[i][0] = x * c - y * s;
+            self[i][1] = x * s + y * c;
+        }
     }
 
-    pub fn rotate_xyz(angles: Vec3<T>) -> Self {
-        let cz = (-angles.z).cos();
-        let sz = (-angles.z).sin();
-        let cy = (-angles.y).cos();
-        let sy = (-angles.y).sin();
-        let cx = (-angles.x).cos();
-        let sx = (-angles.x).sin();
-        Self (
-            Vec4::new(cz * cy, (cz * sy * sx) - (sz * cx), (cz * sy * cx) + (sz * sx), T::zero()),
-            Vec4::new(sz * cy, (sz * sy * sx) + (cz * cx), (sz * sy * cx) - (cz * sx), T::zero()),
-            Vec4::new(-sy, cy * sx, cy * cx, T::zero()),
-            Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
-        )
-    }
+    pub fn rotate_xyz(&mut self, angles: Vec3<T>) {
+        let cx = angles.x.cos();
+        let sx = angles.x.sin();
+        for i in 0..3 {
+            let y = self[i][1];
+            let z = self[i][2];
+            self[i][1] = y * cx - z * sx;
+            self[i][2] = y * sx + z * cx;
+        }
+        let cy = angles.y.cos();
+        let sy = angles.y.sin();
+        for i in 0..3 {
+            let x = self[i][0];
+            let z = self[i][2];
+            self[i][0] = x * cy + z * sy;
+            self[i][2] = -x * sy + z * cy;
+        }
+        let cz = angles.z.cos();
+        let sz = angles.z.sin();
+        for i in 0..3 {
+            let x = self[i][0];
+            let y = self[i][1];
+            self[i][0] = x * cz - y * sz;
+            self[i][1] = x * sz + y * cz;
+        }
+    }    
 
-    pub fn rotate_zyx(angles: Vec3<T>) -> Self {
-        let cz = (angles.z).cos();
-        let sz = (angles.z).sin();
-        let cy = (angles.y).cos();
-        let sy = (angles.y).sin();
-        let cx = (angles.x).cos();
-        let sx = (angles.x).sin();
-        Self (
-            Vec4::new(cz * cy, cy * sz, -sy, T::zero()),
-            Vec4::new((cz * sy * sx) - (cx * sz), (cz * cx) + (sz * sy * sx), cy * sx, T::zero()),
-            Vec4::new((sz * sx) + (cz * cx * sy), (cx * sz * sy) - (cz * sx), cy * cx, T::zero()),
-            Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
-        )
+    pub fn rotate_zyx(&mut self, angles: Vec3<T>) {
+        let cz = angles.z.cos();
+        let sz = angles.z.sin();
+        for i in 0..3 {
+            let x = self[i][0];
+            let y = self[i][1];
+            self[i][0] = x * cz - y * sz;
+            self[i][1] = x * sz + y * cz;
+        }
+        let cy = angles.y.cos();
+        let sy = angles.y.sin();
+        for i in 0..3 {
+            let x = self[i][0];
+            let z = self[i][2];
+            self[i][0] = x * cy + z * sy;
+            self[i][2] = -x * sy + z * cy;
+        }
+        let cx = angles.x.cos();
+        let sx = angles.x.sin();
+        for i in 0..3 {
+            let y = self[i][1];
+            let z = self[i][2];
+            self[i][1] = y * cx - z * sx;
+            self[i][2] = y * sx + z * cx;
+        }
     }
 
     pub fn frustum(left: T, right: T, bottom: T, top: T, near_plane: T, far_plane: T) -> Self {
