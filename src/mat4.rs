@@ -151,9 +151,9 @@ where
 
     #[inline]
     pub fn translate(&mut self, translate: &Vec3<T>) {
-        self.0.w += translate.x;
-        self.1.w += translate.y;
-        self.2.w += translate.z;
+        self.3.x += translate.x;
+        self.3.y += translate.y;
+        self.3.z += translate.z;
     }
 
     #[inline]
@@ -161,8 +161,7 @@ where
         self.0.x *= scale.x;
         self.1.y *= scale.y;
         self.2.z *= scale.z;
-    }
-    
+    }    
 }
 
 impl<T> Mat4<T>
