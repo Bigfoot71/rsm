@@ -8,7 +8,8 @@ use std::slice::{
 };
 
 use std::ops::{
-    Neg, Add, Sub, Mul, Div
+    Neg, Add, Sub, Mul, Div,
+    Index, IndexMut
 };
 
 use crate::vec4::Vec4;
@@ -71,18 +72,6 @@ where
             Vec4::new(T::zero(), T::zero(), scale.z, T::zero()),
             Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
         )
-    }
-
-    #[inline]
-    pub fn iter(&self) -> Iter<'_, Vec4<T>> {
-        let slice: &[Vec4<T>; 4] = unsafe { std::mem::transmute(self) };
-        slice.iter()
-    }
-
-    #[inline]
-    pub fn iter_mut(&mut self) -> IterMut<'_, Vec4<T>> {
-        let slice: &mut [Vec4<T>; 4] = unsafe { std::mem::transmute(self) };
-        slice.iter_mut()
     }
 
     #[inline]
@@ -543,16 +532,29 @@ where
     }
 }
 
-impl<'a, T> IntoIterator for &'a mut Mat4<T>
-where
-    T: NumAssign + Copy
-{
-    type Item = &'a mut Vec4<T>;
-    type IntoIter = IterMut<'a, Vec4<T>>;
+impl<T> Index<usize> for Mat4<T> {
+    type Output = Vec4<T>;
 
-    #[inline]
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
+            0 => &self.0,
+            1 => &self.1,
+            2 => &self.2,
+            3 => &self.3,
+            _ => panic!("Index out of bounds for Mat4"),
+        }
+    }
+}
+
+impl<T> IndexMut<usize> for Mat4<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        match index {
+            0 => &mut self.0,
+            1 => &mut self.1,
+            2 => &mut self.2,
+            3 => &mut self.3,
+            _ => panic!("Index out of bounds for Mat4"),
+        }
     }
 }
 
@@ -565,7 +567,22 @@ where
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
-        self.iter()
+        let slice: &[Vec4<T>; 4] = unsafe { std::mem::transmute(self) };
+        slice.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Mat4<T>
+where
+    T: NumAssign + Copy
+{
+    type Item = &'a mut Vec4<T>;
+    type IntoIter = IterMut<'a, Vec4<T>>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        let slice: &mut [Vec4<T>; 4] = unsafe { std::mem::transmute(self) };
+        slice.iter_mut()
     }
 }
 

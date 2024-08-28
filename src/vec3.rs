@@ -9,7 +9,8 @@ use std::slice::{
 
 use std::ops::{
     Neg, Add, Sub, Mul, Div,
-    AddAssign, SubAssign, MulAssign, DivAssign
+    AddAssign, SubAssign, MulAssign, DivAssign,
+    Index, IndexMut
 };
 
 use std::fmt;
@@ -67,18 +68,6 @@ where
     #[inline]
     pub fn from_vec4(v: &Vec4<T>) -> Self {
         Self::new(v.x, v.y, v.z)
-    }
-
-    #[inline]
-    pub fn iter(&self) -> Iter<'_, T> {
-        let slice: &[T; 3] = unsafe { std::mem::transmute(self) };
-        slice.iter()
-    }
-
-    #[inline]
-    pub fn iter_mut(&mut self) -> IterMut<'_, T> {
-        let slice: &mut [T; 3] = unsafe { std::mem::transmute(self) };
-        slice.iter_mut()
     }
 
     #[inline]
@@ -321,16 +310,27 @@ where
     }
 }
 
-impl<'a, T> IntoIterator for &'a mut Vec3<T>
-where
-    T: NumAssign + Copy
-{
-    type Item = &'a mut T;
-    type IntoIter = IterMut<'a, T>;
+impl<T> Index<usize> for Vec3<T> {
+    type Output = T;
 
-    #[inline]
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => panic!("Index out of bounds for Vec3"),
+        }
+    }
+}
+
+impl<T> IndexMut<usize> for Vec3<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        match index {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            2 => &mut self.z,
+            _ => panic!("Index out of bounds for Vec3"),
+        }
     }
 }
 
@@ -343,7 +343,22 @@ where
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
-        self.iter()
+        let slice: &[T; 3] = unsafe { std::mem::transmute(self) };
+        slice.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec3<T>
+where
+    T: NumAssign + Copy
+{
+    type Item = &'a mut T;
+    type IntoIter = IterMut<'a, T>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        let slice: &mut [T; 3] = unsafe { std::mem::transmute(self) };
+        slice.iter_mut()
     }
 }
 

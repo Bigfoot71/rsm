@@ -8,7 +8,8 @@ use std::slice::{
 };
 
 use std::ops::{
-    Neg, Add, Sub, Mul, Div
+    Neg, Add, Sub, Mul, Div,
+    Index, IndexMut
 };
 
 use crate::vec2::Vec2;
@@ -52,18 +53,6 @@ where
             Vec2::new(sx, T::zero()),
             Vec2::new(T::zero(), sy),
         )
-    }
-
-    #[inline]
-    pub fn iter(&self) -> Iter<'_, Vec2<T>> {
-        let slice: &[Vec2<T>; 2] = unsafe { std::mem::transmute(self) };
-        slice.iter()
-    }
-
-    #[inline]
-    pub fn iter_mut(&mut self) -> IterMut<'_, Vec2<T>> {
-        let slice: &mut [Vec2<T>; 2] = unsafe { std::mem::transmute(self) };
-        slice.iter_mut()
     }
 
     #[inline]
@@ -119,16 +108,27 @@ where
     }
 }
 
-impl<'a, T> IntoIterator for &'a mut Mat2<T>
-where
-    T: NumAssign + Copy
-{
-    type Item = &'a mut Vec2<T>;
-    type IntoIter = IterMut<'a, Vec2<T>>;
+impl<T> Index<usize> for Mat2<T> {
+    type Output = Vec2<T>;
 
     #[inline]
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
+            0 => &self.0,
+            1 => &self.1,
+            _ => panic!("Index out of bounds for Mat2"),
+        }
+    }
+}
+
+impl<T> IndexMut<usize> for Mat2<T> {
+    #[inline]
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        match index {
+            0 => &mut self.0,
+            1 => &mut self.1,
+            _ => panic!("Index out of bounds for Mat2"),
+        }
     }
 }
 
@@ -141,7 +141,22 @@ where
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
-        self.iter()
+        let slice: &[Vec2<T>; 2] = unsafe { std::mem::transmute(self) };
+        slice.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Mat2<T>
+where
+    T: NumAssign + Copy
+{
+    type Item = &'a mut Vec2<T>;
+    type IntoIter = IterMut<'a, Vec2<T>>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        let slice: &mut [Vec2<T>; 2] = unsafe { std::mem::transmute(self) };
+        slice.iter_mut()
     }
 }
 
