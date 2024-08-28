@@ -169,7 +169,7 @@ impl<T> Mat4<T>
 where
     T: NumAssign + Float
 {
-    pub fn invert(&self) -> Self {
+    pub fn invert(&self) -> Option<Self> {
         let a00 = self.0.x;
         let a01 = self.0.y;
         let a02 = self.0.z;
@@ -200,13 +200,17 @@ where
         let b10 = a21 * a33 - a23 * a31;
         let b11 = a22 * a33 - a23 * a32;
 
-        let inv_det = T::one() / (
-            b00 * b11 - b01 * b10 +
-            b02 * b09 + b03 * b08 -
-            b04 * b07 + b05 * b06
-        );
+        let det = b00 * b11 - b01 * b10 +
+                     b02 * b09 + b03 * b08 -
+                     b04 * b07 + b05 * b06;
 
-        Self(
+        if det.is_zero() {
+            return None;
+        }
+
+        let inv_det = T::one() / det;
+
+        Some(Self(
             Vec4::new(
                 (a11 * b11 - a12 * b10 + a13 * b09) * inv_det,
                 (-a01 * b11 + a02 * b10 - a03 * b09) * inv_det,
@@ -231,7 +235,7 @@ where
                 (-a30 * b03 + a31 * b01 - a32 * b00) * inv_det,
                 (a20 * b03 - a21 * b01 + a22 * b00) * inv_det,
             )
-        )
+        ))
     }
 
     pub fn rotate(&mut self, mut axis: Vec3<T>, angle: T) {

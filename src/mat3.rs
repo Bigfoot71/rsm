@@ -131,7 +131,7 @@ impl<T> Mat3<T>
 where
     T: NumAssign + Float
 {
-    pub fn invert(&self) -> Self {
+    pub fn invert(&self) -> Option<Self> {
         let a00 = self.0.x;
         let a01 = self.0.y;
         let a02 = self.0.z;
@@ -148,17 +148,17 @@ where
 
         let det = a00 * b01 + a01 * b11 + a02 * b21;
 
-        if det == T::zero() {
-            return Self::zero(); // Or handle non-invertible case differently
+        if det.is_zero() {
+            return None;
         }
 
         let inv_det = T::one() / det;
 
-        Self(
+        Some(Self(
             Vec3::new(b01 * inv_det, (-a22 * a01 + a02 * a21) * inv_det, (a12 * a01 - a02 * a11) * inv_det),
             Vec3::new(b11 * inv_det, (a22 * a00 - a02 * a20) * inv_det, (-a12 * a00 + a02 * a10) * inv_det),
             Vec3::new(b21 * inv_det, (-a21 * a00 + a01 * a20) * inv_det, (a11 * a00 - a01 * a10) * inv_det)
-        )
+        ))
     }
 
     #[inline]
