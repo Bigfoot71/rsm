@@ -774,6 +774,103 @@ where
             Some(Self::new(v_x, v_y))
         }
     }
+
+    /// Rotates the vector by a given angle (in radians) around the origin.
+    ///
+    /// This method applies a 2D rotation to the vector, rotating it by the specified
+    /// angle in a counterclockwise direction around the origin (0, 0).
+    ///
+    /// # Arguments
+    ///
+    /// * `angle` - The angle of rotation in radians. A positive angle rotates the vector
+    ///             counterclockwise, while a negative angle rotates it clockwise.
+    ///
+    /// # Returns
+    ///
+    /// A new vector that represents the original vector rotated by the specified angle.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let v = Vec2::new(1.0, 0.0);
+    /// let rotated_v = v.rotate(std::f32::consts::PI / 2.0);
+    /// assert_eq!(rotated_v, Vec2::new(0.0, 1.0));
+    /// ```
+    #[inline]
+    pub fn rotate(&self, angle: T) -> Self {
+        let c = angle.cos();
+        let s = angle.sin();
+        Self::new(
+            self.x * c - self.y * s,
+            self.x * s + self.y * c,
+        )
+    }
+
+    /// Moves the vector towards a target vector by a specified maximum distance.
+    ///
+    /// This method calculates the direction from the vector to a target vector and
+    /// moves the vector along that direction by a specified maximum distance. If the
+    /// target vector is closer than the specified distance, the vector will be moved
+    /// directly to the target position.
+    ///
+    /// # Arguments
+    ///
+    /// * `target` - The target vector to move towards.
+    /// * `max_distance` - The maximum distance to move. If this distance is greater
+    ///                    than the distance to the target, the vector will move directly
+    ///                    to the target.
+    ///
+    /// # Returns
+    ///
+    /// A new vector that represents the original vector moved towards the target by
+    /// the specified distance.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let start = Vec2::new(1.0, 1.0);
+    /// let target = Vec2::new(4.0, 5.0);
+    /// let result = start.move_towards(&target, 2.0);
+    /// // result will be a vector closer to the target by 2.0 units.
+    /// ```
+    #[inline]
+    pub fn move_towards(&self, target: &Self, max_distance: T) -> Self {
+        let dir = *target - *self;
+        let dist_sq = dir.length_squared();
+        if dist_sq.is_zero() || (max_distance * max_distance >= dist_sq) {
+            return *target;
+        }
+        let dist = dist_sq.sqrt();
+        *self + (dir / dist) * max_distance
+    }
+
+    /// Computes the reciprocal (1/x) of each component of the vector.
+    ///
+    /// This method returns a new vector where each component is the reciprocal
+    /// of the corresponding component of the original vector. This is equivalent
+    /// to element-wise division of 1 by the vector components.
+    ///
+    /// # Returns
+    ///
+    /// A new vector where each component is the reciprocal of the corresponding
+    /// component of the original vector.
+    ///
+    /// # Panics
+    ///
+    /// This method will panic if any component of the vector is zero, as the reciprocal
+    /// of zero is undefined and would result in a division by zero error.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let v = Vec2::new(2.0, 4.0);
+    /// let recip_v = v.recip();
+    /// assert_eq!(recip_v, Vec2::new(0.5, 0.25));
+    /// ```
+    #[inline]
+    pub fn recip(&self) -> Self {
+        Self::new(self.x.recip(), self.y.recip())
+    }
 }
 
 impl<T> fmt::Display for Vec2<T>
