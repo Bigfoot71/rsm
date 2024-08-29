@@ -48,14 +48,6 @@ where
     }
 
     #[inline]
-    pub fn scale(sx: T, sy: T) -> Self {
-        Self (
-            Vec2::new(sx, T::zero()),
-            Vec2::new(T::zero(), sy),
-        )
-    }
-
-    #[inline]
     pub fn transpose(&self) -> Self {
         Self (
             Vec2::new(self.0.x, self.1.x),
@@ -82,20 +74,33 @@ where
         );
         Self::new(&col0, &col1)
     }
+
+    #[inline]
+    pub fn scale(&mut self, scale: Vec2<T>) {
+        self.0.x *= scale.x;
+        self.1.y *= scale.y;
+    }
 }
 
 impl<T> Mat2<T>
 where
     T: NumAssign + Float,
 {
-    #[inline]
-    pub fn rotation(angle: T) -> Self {
+    pub fn rotation(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
-        Self (
-            Vec2::new(c, -s),
-            Vec2::new(s, c),
-        )
+
+        let new_x0 = c * self[0][0] - s * self[1][0];
+        let new_x1 = c * self[0][1] - s * self[1][1];
+
+        let new_y0 = s * self[0][0] + c * self[1][0];
+        let new_y1 = s * self[0][1] + c * self[1][1];
+
+        self[0][0] = new_x0;
+        self[0][1] = new_x1;
+
+        self[1][0] = new_y0;
+        self[1][1] = new_y1;
     }
 }
 

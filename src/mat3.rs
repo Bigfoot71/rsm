@@ -52,33 +52,6 @@ where
     }
 
     #[inline]
-    pub fn translate_2d(translate: &Vec2<T>) -> Self {
-        Self (
-            Vec3::new(T::one(), T::zero(), T::zero()),
-            Vec3::new(T::zero(), T::one(), T::zero()),
-            Vec3::new(translate.x, translate.y, T::one()),
-        )
-    }
-
-    #[inline]
-    pub fn scale_2d(scale: &Vec2<T>) -> Self {
-        Self (
-            Vec3::new(scale.x, T::zero(), T::zero()),
-            Vec3::new(T::zero(), scale.y, T::zero()),
-            Vec3::new(T::zero(), T::zero(), T::one()),
-        )
-    }
-
-    #[inline]
-    pub fn scale_3d(scale: &Vec3<T>) -> Self {
-        Self (
-            Vec3::new(scale.x, T::zero(), T::zero()),
-            Vec3::new(T::zero(), scale.y, T::zero()),
-            Vec3::new(T::zero(), T::zero(), scale.z),
-        )
-    }
-
-    #[inline]
     pub fn transpose(&self) -> Self {
         Self (
             Vec3::new(self.0.x, self.1.x, self.2.x),
@@ -125,6 +98,25 @@ where
         );
         Self::new(&col0, &col1, &col2)
     }
+
+    #[inline]
+    pub fn translate_2d(&mut self, translate: &Vec2<T>) {
+        self.2.x += translate.x;
+        self.2.y += translate.y;
+    }
+
+    #[inline]
+    pub fn scale_2d(&mut self, scale: &Vec2<T>) {
+        self.0.x *= scale.x;
+        self.1.y *= scale.y;
+    }
+
+    #[inline]
+    pub fn scale_3d(&mut self, scale: &Vec3<T>) {
+        self.0.x *= scale.x;
+        self.1.y *= scale.y;
+        self.2.z *= scale.z;
+    }
 }
 
 impl<T> Mat3<T>
@@ -161,75 +153,121 @@ where
         ))
     }
 
-    #[inline]
-    pub fn rotate_2d(angle: T) -> Self {
+    pub fn rotate_2d(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
-        Self (
-            Vec3::new(c, s, T::zero()),
-            Vec3::new(-s, c, T::zero()),
-            Vec3::new(T::zero(), T::zero(), T::one()),
-        )
+
+        let x0 = self[0][0] * c + self[1][0] * s;
+        let x1 = self[0][1] * c + self[1][1] * s;
+        let x2 = self[0][2] * c + self[1][2] * s;
+
+        let y0 = -self[0][0] * s + self[1][0] * c;
+        let y1 = -self[0][1] * s + self[1][1] * c;
+        let y2 = -self[0][2] * s + self[1][2] * c;
+
+        self[0][0] = x0;
+        self[0][1] = x1;
+        self[0][2] = x2;
+
+        self[1][0] = y0;
+        self[1][1] = y1;
+        self[1][2] = y2;
     }
 
-    pub fn rotate_3d(mut axis: Vec3<T>, angle: T) -> Self {
+    pub fn rotate_3d(&mut self, mut axis: Vec3<T>, angle: T) {
         let len_sq = axis.length_squared();
         if !(len_sq.is_one() || len_sq.is_zero()) {
             let inv_len = len_sq.sqrt();
             axis *= inv_len;
         }
+
         let s = angle.sin();
         let c = angle.cos();
         let t = T::one() - c;
 
-        Self(
-            Vec3::<T>::new(
+        let rotation = Self::new(
+            &Vec3::new(
                 axis.x * axis.x * t + c,
                 axis.y * axis.x * t + axis.z * s,
                 axis.z * axis.x * t - axis.y * s,
             ),
-            Vec3::<T>::new(
+            &Vec3::new(
                 axis.x * axis.y * t - axis.z * s,
                 axis.y * axis.y * t + c,
                 axis.z * axis.y * t + axis.x * s,
             ),
-            Vec3::<T>::new(
+            &Vec3::new(
                 axis.x * axis.z * t + axis.y * s,
                 axis.y * axis.z * t - axis.x * s,
                 axis.z * axis.z * t + c,
-            ),
-        )
+            )
+        );
+
+        *self = self.mul(rotation);
     }
 
-    pub fn rotate_x_3d(angle: T) -> Self {
+    pub fn rotate_x_3d(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
-        Self (
-            Vec3::new(T::one(), T::zero(), T::zero()),
-            Vec3::new(T::zero(), c, s),
-            Vec3::new(T::zero(), -s, c),
-        )
+
+        let y0 = self[1][0] * c + self[2][0] * s;
+        let y1 = self[1][1] * c + self[2][1] * s;
+        let y2 = self[1][2] * c + self[2][2] * s;
+
+        let z0 = -self[1][0] * s + self[2][0] * c;
+        let z1 = -self[1][1] * s + self[2][1] * c;
+        let z2 = -self[1][2] * s + self[2][2] * c;
+
+        self[1][0] = y0;
+        self[1][1] = y1;
+        self[1][2] = y2;
+
+        self[2][0] = z0;
+        self[2][1] = z1;
+        self[2][2] = z2;
+    }    
+
+    pub fn rotate_y_3d(&mut self, angle: T) {
+        let c = angle.cos();
+        let s = angle.sin();
+
+        let x0 = self[0][0] * c - self[2][0] * s;
+        let x1 = self[0][1] * c - self[2][1] * s;
+        let x2 = self[0][2] * c - self[2][2] * s;
+
+        let z0 = self[0][0] * s + self[2][0] * c;
+        let z1 = self[0][1] * s + self[2][1] * c;
+        let z2 = self[0][2] * s + self[2][2] * c;
+
+        self[0][0] = x0;
+        self[0][1] = x1;
+        self[0][2] = x2;
+
+        self[2][0] = z0;
+        self[2][1] = z1;
+        self[2][2] = z2;
     }
 
-    pub fn rotate_y_3d(angle: T) -> Self {
+    pub fn rotate_z_3d(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
-        Self (
-            Vec3::new(c, T::zero(), -s),
-            Vec3::new(T::zero(), T::one(), T::zero()),
-            Vec3::new(s, T::zero(), c),
-        )
-    }
 
-    pub fn rotate_z_3d(angle: T) -> Self {
-        let c = angle.cos();
-        let s = angle.sin();
-        Self (
-            Vec3::new(c, s, T::zero()),
-            Vec3::new(-s, c, T::zero()),
-            Vec3::new(T::zero(), T::zero(), T::one()),
-        )
-    }
+        let x0 = self[0][0] * c + self[1][0] * s;
+        let x1 = self[0][1] * c + self[1][1] * s;
+        let x2 = self[0][2] * c + self[1][2] * s;
+
+        let y0 = -self[0][0] * s + self[1][0] * c;
+        let y1 = -self[0][1] * s + self[1][1] * c;
+        let y2 = -self[0][2] * s + self[1][2] * c;
+
+        self[0][0] = x0;
+        self[0][1] = x1;
+        self[0][2] = x2;
+
+        self[1][0] = y0;
+        self[1][1] = y1;
+        self[1][2] = y2;
+    }    
 }
 
 impl<T> fmt::Display for Mat3<T>
