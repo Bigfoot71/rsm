@@ -8,7 +8,7 @@ documentation = "https://docs.rs/rsm"
 license-file = "LICENSE.md"
 authors = ["Le Juez Victor"]
 repository = "https://github.com/Bigfoot71/rsm"
-keywords = ["math", "linear algebra", "vector", "matrix", "rust"]
+keywords = ["math", "linear", algebra", "vector", "matrix", "rust"]
 categories = ["mathematics", "linear-algebra"]
 
 [dependencies]
