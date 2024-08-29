@@ -833,7 +833,6 @@ where
     /// let result = start.move_towards(&target, 2.0);
     /// // result will be a vector closer to the target by 2.0 units.
     /// ```
-    #[inline]
     pub fn move_towards(&self, target: &Self, max_distance: T) -> Self {
         let dir = *target - *self;
         let dist_sq = dir.length_squared();
