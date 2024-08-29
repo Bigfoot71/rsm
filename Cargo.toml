@@ -5,7 +5,6 @@ edition = "2021"
 description = "A mathematics library for Rust, providing support for vector, matrix, and scalar operations."
 homepage = "https://github.com/Bigfoot71/rsm"
 documentation = "https://docs.rs/rsm"
-license = "MIT"
 license-file = "LICENSE.md"
 authors = ["Le Juez Victor"]
 repository = "https://github.com/Bigfoot71/rsm"
