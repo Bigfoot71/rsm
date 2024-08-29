@@ -39,36 +39,130 @@ impl<T> Vec4<T>
 where
     T: NumAssign + Copy,
 {
+    /// Creates a new `Vec4` with the specified components.
+    ///
+    /// # Parameters
+    /// - `x`: The x component of the vector.
+    /// - `y`: The y component of the vector.
+    /// - `z`: The z component of the vector.
+    /// - `w`: The w component of the vector.
+    ///
+    /// # Returns
+    /// Returns a new `Vec4` instance with the specified components.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec = Vec4::new(1.0, 2.0, 3.0, 4.0);
+    /// assert_eq!(vec, Vec4::new(1.0, 2.0, 3.0, 4.0)); // Vector with components (1, 2, 3, 4)
+    /// ```
     #[inline]
     pub fn new(x: T, y: T, z: T, w: T) -> Self {
         Self { x, y, z, w }
     }
 
+    /// Creates a new `Vec4` with all components set to zero.
+    ///
+    /// # Returns
+    /// Returns a new `Vec4` instance where all components are zero.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec = Vec4::zero();
+    /// assert_eq!(vec, Vec4::new(0.0, 0.0, 0.0, 0.0)); // Vector with all components zero
+    /// ```
     #[inline]
     pub fn zero() -> Self {
         Self::new(T::zero(), T::zero(), T::zero(), T::zero())
     }
 
+    /// Creates a new `Vec4` with all components set to one.
+    ///
+    /// # Returns
+    /// Returns a new `Vec4` instance where all components are one.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec = Vec4::one();
+    /// assert_eq!(vec, Vec4::new(1.0, 1.0, 1.0, 1.0)); // Vector with all components one
+    /// ```
     #[inline]
     pub fn one() -> Self {
         Self::new(T::one(), T::one(), T::one(), T::one())
     }
 
+    /// Creates a new `Vec4` where all components are set to the same value.
+    ///
+    /// # Parameters
+    /// - `v`: The value to set for all components.
+    ///
+    /// # Returns
+    /// Returns a new `Vec4` instance where all components are set to `v`.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec = Vec4::set(5.0);
+    /// assert_eq!(vec, Vec4::new(5.0, 5.0, 5.0, 5.0)); // Vector with all components 5
+    /// ```
     #[inline]
     pub fn set(v: T) -> Self {
         Self::new(v, v, v, v)
     }
 
+    /// Creates a `Vec4` from a `Vec2` by setting the z and w components to zero.
+    ///
+    /// # Parameters
+    /// - `v`: The `Vec2` to convert.
+    ///
+    /// # Returns
+    /// Returns a new `Vec4` instance where the x and y components are taken from `v`,
+    /// and the z and w components are set to zero.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec2 = Vec2::new(1.0, 2.0);
+    /// let vec4 = Vec4::from_vec2(&vec2);
+    /// assert_eq!(vec4, Vec4::new(1.0, 2.0, 0.0, 0.0)); // Vector (1, 2, 0, 0)
+    /// ```
     #[inline]
     pub fn from_vec2(v: &Vec2<T>) -> Self {
         Self::new(v.x, v.y, T::zero(), T::zero())
     }
 
+    /// Creates a `Vec4` from a `Vec3` by setting the w component to zero.
+    ///
+    /// # Parameters
+    /// - `v`: The `Vec3` to convert.
+    ///
+    /// # Returns
+    /// Returns a new `Vec4` instance where the x, y, and z components are taken from `v`,
+    /// and the w component is set to zero.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec3 = Vec3::new(1.0, 2.0, 3.0);
+    /// let vec4 = Vec4::from_vec3(&vec3);
+    /// assert_eq!(vec4, Vec4::new(1.0, 2.0, 3.0, 0.0)); // Vector (1, 2, 3, 0)
+    /// ```
     #[inline]
     pub fn from_vec3(v: &Vec3<T>) -> Self {
         Self::new(v.x, v.y, v.z, T::zero())
     }
 
+    /// Computes the dot product of this vector and another vector.
+    ///
+    /// # Parameters
+    /// - `other`: The vector to compute the dot product with.
+    ///
+    /// # Returns
+    /// Returns the dot product of `self` and `other` as a value of type `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec1 = Vec4::new(1.0, 2.0, 3.0, 4.0);
+    /// let vec2 = Vec4::new(5.0, 6.0, 7.0, 8.0);
+    /// let dot_product = vec1.dot(&vec2);
+    /// assert_eq!(dot_product, 70.0); // Dot product calculation
+    /// ```
     #[inline]
     pub fn dot(&self, other: &Self) -> T {
         self.x * other.x +
@@ -77,6 +171,17 @@ where
         self.w * other.w
     }
 
+    /// Computes the squared length (magnitude) of this vector.
+    ///
+    /// # Returns
+    /// Returns the squared length of the vector as a value of type `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec = Vec4::new(1.0, 2.0, 3.0, 4.0);
+    /// let length_squared = vec.length_squared();
+    /// assert_eq!(length_squared, 30.0); // Squared length calculation
+    /// ```
     #[inline]
     pub fn length_squared(&self) -> T {
         self.x * self.x +
@@ -85,6 +190,23 @@ where
         self.w * self.w
     }
 
+    /// Applies a transformation matrix to this vector.
+    ///
+    /// The vector is transformed using a 4x4 matrix.
+    ///
+    /// # Parameters
+    /// - `transform`: The transformation matrix to apply.
+    ///
+    /// # Returns
+    /// Returns a new `Vec4` instance that is the result of transforming `self` using `transform`.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec = Vec4::new(1.0, 2.0, 3.0, 1.0);
+    /// let transform = Mat4::identity(); // Assuming an identity matrix
+    /// let transformed_vec = vec.transform(&transform);
+    /// assert_eq!(transformed_vec, Vec4::new(1.0, 2.0, 3.0, 1.0)); // No change for identity matrix
+    /// ```
     #[inline]
     pub fn transform(&self, transform: &Mat4<T>) -> Self {
         let x = transform.0.x * self.x + transform.1.x * self.y + transform.2.x * self.z + transform.3.x * self.w;
@@ -99,6 +221,25 @@ impl<T> Vec4<T>
 where
     T: NumAssign + Copy + PartialOrd,
 {
+    /// Computes the component-wise minimum of this vector and another vector.
+    ///
+    /// For each component, this method returns the minimum of the corresponding
+    /// components of `self` and `other`.
+    ///
+    /// # Parameters
+    /// - `other`: The vector to compare against.
+    ///
+    /// # Returns
+    /// Returns a new `Vec4` instance where each component is the minimum
+    /// of the corresponding components of `self` and `other`.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec1 = Vec4::new(1.0, 2.0, 3.0, 4.0);
+    /// let vec2 = Vec4::new(2.0, 1.0, 4.0, 3.0);
+    /// let min_vec = vec1.min(&vec2);
+    /// assert_eq!(min_vec, Vec4::new(1.0, 1.0, 3.0, 3.0)); // Minimum component-wise
+    /// ```
     #[inline]
     pub fn min(&self, other: &Self) -> Self {
         Self::new(
@@ -109,6 +250,25 @@ where
         )
     }
 
+    /// Computes the component-wise maximum of this vector and another vector.
+    ///
+    /// For each component, this method returns the maximum of the corresponding
+    /// components of `self` and `other`.
+    ///
+    /// # Parameters
+    /// - `other`: The vector to compare against.
+    ///
+    /// # Returns
+    /// Returns a new `Vec4` instance where each component is the maximum
+    /// of the corresponding components of `self` and `other`.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec1 = Vec4::new(1.0, 2.0, 3.0, 4.0);
+    /// let vec2 = Vec4::new(2.0, 1.0, 4.0, 3.0);
+    /// let max_vec = vec1.max(&vec2);
+    /// assert_eq!(max_vec, Vec4::new(2.0, 2.0, 4.0, 4.0)); // Maximum component-wise
+    /// ```
     #[inline]
     pub fn max(&self, other: &Self) -> Self {
         Self::new(
@@ -119,6 +279,29 @@ where
         )
     }
 
+    /// Clamps each component of this vector between the corresponding components of
+    /// the given `min` and `max` vectors.
+    ///
+    /// For each component, this method ensures that the component of `self` is
+    /// at least the corresponding component of `min` and at most the corresponding
+    /// component of `max`.
+    ///
+    /// # Parameters
+    /// - `min`: The vector representing the minimum bounds.
+    /// - `max`: The vector representing the maximum bounds.
+    ///
+    /// # Returns
+    /// Returns a new `Vec4` instance where each component is clamped between the
+    /// corresponding components of `min` and `max`.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec = Vec4::new(5.0, -3.0, 10.0, 2.0);
+    /// let min_vec = Vec4::new(0.0, 0.0, 5.0, 1.0);
+    /// let max_vec = Vec4::new(4.0, 2.0, 8.0, 3.0);
+    /// let clamped_vec = vec.clamp(&min_vec, &max_vec);
+    /// assert_eq!(clamped_vec, Vec4::new(4.0, 0.0, 8.0, 2.0)); // Clamped component-wise
+    /// ```
     #[inline]
     pub fn clamp(&self, min: &Self, max: &Self) -> Self {
         Self::new(
@@ -134,11 +317,41 @@ impl<T> Vec4<T>
 where
     T: NumAssign + Float,
 {
+    /// Computes the length (magnitude) of this `Vec4`.
+    ///
+    /// This method calculates the Euclidean length of the vector using the formula:
+    /// `sqrt(x^2 + y^2 + z^2 + w^2)`.
+    ///
+    /// # Returns
+    /// Returns the length of the vector as a `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec = Vec4::new(3.0, 4.0, 0.0, 0.0);
+    /// let length = vec.length();
+    /// assert_eq!(length, 5.0); // Euclidean length of the vector (3, 4, 0, 0)
+    /// ```
     #[inline]
     pub fn length(&self) -> T {
         (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
     }
 
+    /// Normalizes the vector, scaling it to a unit vector.
+    ///
+    /// This method returns a new `Vec4` with the same direction as `self` but with a length of 1.
+    /// If the vector length is zero, meaning it's a zero vector, normalization is not possible,
+    /// and `None` is returned to indicate this failure.
+    ///
+    /// # Returns
+    /// - `Some(Self)`: A unit vector in the same direction as `self` if normalization is possible.
+    /// - `None`: If `self` is a zero vector (length is zero), normalization is not possible.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec = Vec4::new(1.0, 2.0, 2.0, 0.0);
+    /// let normalized = vec.normalize();
+    /// assert_eq!(normalized, Some(Vec4::new(0.33333334, 0.6666667, 0.6666667, 0.0)));
+    /// ```
     #[inline]
     pub fn normalize(&self) -> Option<Self> {
         let len = self.length();
@@ -149,6 +362,27 @@ where
         }
     }
 
+    /// Performs linear interpolation between this vector and another vector.
+    ///
+    /// This method returns a vector that is a linear interpolation between `self` and `other`
+    /// by a factor `t`. If `t` is 0, the result is `self`. If `t` is 1, the result is `other`.
+    /// Values of `t` between 0 and 1 will yield a result that is a blend of the two vectors.
+    ///
+    /// # Parameters
+    /// - `other`: The target vector to interpolate towards.
+    /// - `t`: The interpolation factor, where `t` is between 0 and 1.
+    ///
+    /// # Returns
+    /// Returns a new `Vec4` that is the result of the interpolation.
+    ///
+    /// # Examples
+    /// ```
+    /// let vec1 = Vec4::new(1.0, 2.0, 3.0, 4.0);
+    /// let vec2 = Vec4::new(5.0, 6.0, 7.0, 8.0);
+    /// let t = 0.5;
+    /// let interpolated = vec1.lerp(&vec2, t);
+    /// assert_eq!(interpolated, Vec4::new(3.0, 4.0, 5.0, 6.0)); // Midpoint between vec1 and vec2
+    /// ```
     #[inline]
     pub fn lerp(&self, other: &Self, t: T) -> Self {
         Self::new(
