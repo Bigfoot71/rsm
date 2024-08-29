@@ -278,6 +278,25 @@ where
             self.z + t * (other.z - self.z)
         )
     }
+
+    pub fn move_towards(&self, target: &Self, max_distance: T) -> Self {
+        let dir = *target - *self;
+        let dist_sq = dir.length_squared();
+        if dist_sq.is_zero() || (max_distance * max_distance >= dist_sq) {
+            return *target;
+        }
+        let dist = dist_sq.sqrt();
+        *self + (dir / dist) * max_distance
+    }
+
+    #[inline]
+    pub fn recip(&self) -> Self {
+        Self::new(
+            self.x.recip(),
+            self.y.recip(),
+            self.z.recip()
+        )
+    }
 }
 
 impl<T> fmt::Display for Vec3<T>
