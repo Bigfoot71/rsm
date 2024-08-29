@@ -2,6 +2,15 @@
 name = "rsm"
 version = "0.1.0"
 edition = "2021"
+description = "A mathematics library for Rust, providing support for vector, matrix, and scalar operations."
+homepage = "https://github.com/Bigfoot71/rsm"
+documentation = "https://docs.rs/rsm"
+license = "MIT"
+license-file = "LICENSE.md"
+authors = ["Le Juez Victor"]
+repository = "https://github.com/Bigfoot71/rsm"
+keywords = ["math", "linear algebra", "vector", "matrix", "rust"]
+categories = ["mathematics", "linear-algebra"]
 
 [dependencies]
 num-traits = "0.2.19"
