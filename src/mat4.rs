@@ -29,11 +29,39 @@ impl<T> Mat4<T>
 where
     T: NumAssign + Copy,
 {
+    /// Creates a new `Mat4` instance from four column vectors.
+    ///
+    /// # Parameters
+    /// - `col0`: The first column vector.
+    /// - `col1`: The second column vector.
+    /// - `col2`: The third column vector.
+    /// - `col3`: The fourth column vector.
+    ///
+    /// # Returns
+    /// Returns a new `Mat4` with the specified column vectors.
+    ///
+    /// # Examples
+    /// ```
+    /// let col0 = Vec4::new(1.0, 0.0, 0.0, 0.0);
+    /// let col1 = Vec4::new(0.0, 1.0, 0.0, 0.0);
+    /// let col2 = Vec4::new(0.0, 0.0, 1.0, 0.0);
+    /// let col3 = Vec4::new(0.0, 0.0, 0.0, 1.0);
+    /// let mat = Mat4::new(&col0, &col1, &col2, &col3);
+    /// ```
     #[inline]
     pub fn new(col0: &Vec4<T>, col1: &Vec4<T>, col2: &Vec4<T>, col3: &Vec4<T>) -> Self {
         Self (col0.clone(), col1.clone(), col2.clone(), col3.clone())
     }
 
+    /// Returns the zero matrix (all elements are zero).
+    ///
+    /// # Returns
+    /// Returns a new `Mat4` where all components are zero.
+    ///
+    /// # Examples
+    /// ```
+    /// let mat = Mat4::zero();
+    /// ```
     #[inline]
     pub fn zero() -> Self {
         Self (
@@ -44,6 +72,15 @@ where
         )
     }
 
+    /// Returns the identity matrix (diagonal with ones).
+    ///
+    /// # Returns
+    /// Returns a new `Mat4` with ones on the diagonal and zeros elsewhere.
+    ///
+    /// # Examples
+    /// ```
+    /// let mat = Mat4::identity();
+    /// ```
     #[inline]
     pub fn identity() -> Self {
         Self (
@@ -54,6 +91,19 @@ where
         )
     }
 
+    /// Computes the transpose of the matrix.
+    ///
+    /// The transpose of a matrix is obtained by swapping rows with columns.
+    ///
+    /// # Returns
+    /// Returns a new `Mat4` which is the transpose of the original matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// let mat = Mat4::identity();
+    /// let transposed = mat.transpose();
+    /// assert_eq!(transposed, mat);
+    /// ```
     #[inline]
     pub fn transpose(&self) -> Self {
         Self (
@@ -64,6 +114,19 @@ where
         )
     }
 
+    /// Computes the determinant of the matrix.
+    ///
+    /// The determinant is a scalar value that can be used to determine if the matrix is invertible.
+    ///
+    /// # Returns
+    /// Returns the determinant as a `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// let mat = Mat4::identity();
+    /// let determinant = mat.determinant();
+    /// assert_eq!(determinant, 1.0);
+    /// ```
     pub fn determinant(&self) -> T {
         let a00 = self.0.x;
         let a01 = self.0.y;
@@ -117,10 +180,38 @@ where
         determinant
     }
 
+    /// Computes the trace of the matrix.
+    ///
+    /// The trace is the sum of the diagonal elements.
+    ///
+    /// # Returns
+    /// Returns the trace as a `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// let mat = Mat4::identity();
+    /// let trace = mat.trace();
+    /// assert_eq!(trace, 4.0);
+    /// ```
     pub fn trace(&self) -> T {
-        self.0.x + self.1.x + self.2.x + self.3.x
+        self.0.x + self.1.y + self.2.z + self.3.w
     }
 
+    /// Multiplies this matrix by another matrix.
+    ///
+    /// # Parameters
+    /// - `other`: The matrix to multiply with.
+    ///
+    /// # Returns
+    /// Returns the resulting matrix after multiplication.
+    ///
+    /// # Examples
+    /// ```
+    /// let mat1 = Mat4::identity();
+    /// let mat2 = Mat4::identity();
+    /// let result = mat1.mul(&mat2);
+    /// assert_eq!(result, mat1);
+    /// ```
     pub fn mul(&self, other: &Self) -> Self {
         let col0 = Vec4::new(
             self.0.dot(&Vec4::new(other.0.x, other.1.x, other.2.x, other.3.x)),
@@ -149,6 +240,19 @@ where
         Self::new(&col0, &col1, &col2, &col3)
     }
 
+    /// Applies a translation transformation to the matrix.
+    ///
+    /// This method modifies the matrix to include the translation vector.
+    ///
+    /// # Parameters
+    /// - `translate`: The translation vector to apply.
+    ///
+    /// # Examples
+    /// ```
+    /// let mut mat = Mat4::identity();
+    /// let translate = Vec3::new(1.0, 2.0, 3.0);
+    /// mat.translate(&translate);
+    /// ```
     #[inline]
     pub fn translate(&mut self, translate: &Vec3<T>) {
         self.3.x += translate.x;
@@ -156,6 +260,19 @@ where
         self.3.z += translate.z;
     }
 
+    /// Applies a scale transformation to the matrix.
+    ///
+    /// This method modifies the matrix to include the scaling vector.
+    ///
+    /// # Parameters
+    /// - `scale`: The scaling vector to apply.
+    ///
+    /// # Examples
+    /// ```
+    /// let mut mat = Mat4::identity();
+    /// let scale = Vec3::new(2.0, 3.0, 4.0);
+    /// mat.scale(&scale);
+    /// ```
     #[inline]
     pub fn scale(&mut self, scale: &Vec3<T>) {
         self.0.x *= scale.x;
@@ -166,8 +283,20 @@ where
 
 impl<T> Mat4<T>
 where
-    T: NumAssign + Float
+    T: NumAssign + Float,
 {
+    /// Computes the inverse of the matrix.
+    ///
+    /// # Returns
+    /// Returns `Some(Self)` if the matrix is invertible, `None` otherwise. The inverse is computed using the adjugate method and determinant.
+    ///
+    /// # Examples
+    /// ```
+    /// use std::f32::consts::PI;
+    /// let mat = Mat4::identity();
+    /// let inv = mat.invert();
+    /// assert!(inv.is_some());
+    /// ```
     pub fn invert(&self) -> Option<Self> {
         let a00 = self.0.x;
         let a01 = self.0.y;
@@ -199,9 +328,8 @@ where
         let b10 = a21 * a33 - a23 * a31;
         let b11 = a22 * a33 - a23 * a32;
 
-        let det = b00 * b11 - b01 * b10 +
-                     b02 * b09 + b03 * b08 -
-                     b04 * b07 + b05 * b06;
+        let det = b00 * b11 - b01 * b10 + b02 * b09
+            - b03 * b08 - b04 * b07 + b05 * b06;
 
         if det.is_zero() {
             return None;
@@ -233,17 +361,33 @@ where
                 (a00 * b09 - a01 * b07 + a02 * b06) * inv_det,
                 (-a30 * b03 + a31 * b01 - a32 * b00) * inv_det,
                 (a20 * b03 - a21 * b01 + a22 * b00) * inv_det,
-            )
+            ),
         ))
     }
 
-    pub fn rotate(&mut self, mut axis: Vec3<T>, angle: T) {
+    /// Applies a rotation transformation to the matrix around an arbitrary axis.
+    ///
+    /// # Parameters
+    /// - `axis`: The axis of rotation as a `Vec3<T>`. It should be normalized.
+    /// - `angle`: The angle of rotation in radians.
+    ///
+    /// # Examples
+    /// ```
+    /// use std::f32::consts::PI;
+    /// let mut mat = Mat4::identity();
+    /// let axis = Vec3::new(0.0, 1.0, 0.0);
+    /// let angle = PI / 4.0; // 45 degrees
+    /// mat.rotate(&axis, angle);
+    /// ```
+    pub fn rotate(&mut self, axis: Vec3<T>, angle: T) {
         let len_sq = axis.length_squared();
-        if !(len_sq.is_one() || len_sq.is_zero()) {
-            let inv_len = len_sq.sqrt();
-            axis *= inv_len;
-        }
-    
+        let inv_len = if len_sq.is_zero() {
+            T::zero()
+        } else {
+            len_sq.sqrt().recip()
+        };
+
+        let axis = axis * inv_len;
         let s = angle.sin();
         let c = angle.cos();
         let t = T::one() - c;
@@ -251,11 +395,11 @@ where
         let m00 = axis.x * axis.x * t + c;
         let m01 = axis.y * axis.x * t + axis.z * s;
         let m02 = axis.z * axis.x * t - axis.y * s;
-    
+
         let m10 = axis.x * axis.y * t - axis.z * s;
         let m11 = axis.y * axis.y * t + c;
         let m12 = axis.z * axis.y * t + axis.x * s;
-    
+
         let m20 = axis.x * axis.z * t + axis.y * s;
         let m21 = axis.y * axis.z * t - axis.x * s;
         let m22 = axis.z * axis.z * t + c;
@@ -270,6 +414,18 @@ where
         }
     }
 
+    /// Rotates the matrix around the X-axis by a given angle.
+    ///
+    /// # Parameters
+    /// - `angle`: The angle of rotation in radians.
+    ///
+    /// # Examples
+    /// ```
+    /// use std::f32::consts::PI;
+    /// let mut mat = Mat4::identity();
+    /// let angle = PI / 4.0; // 45 degrees
+    /// mat.rotate_x(angle);
+    /// ```
     pub fn rotate_x(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
@@ -281,6 +437,18 @@ where
         }
     }
 
+    /// Rotates the matrix around the Y-axis by a given angle.
+    ///
+    /// # Parameters
+    /// - `angle`: The angle of rotation in radians.
+    ///
+    /// # Examples
+    /// ```
+    /// use std::f32::consts::PI;
+    /// let mut mat = Mat4::identity();
+    /// let angle = PI / 4.0; // 45 degrees
+    /// mat.rotate_y(angle);
+    /// ```
     pub fn rotate_y(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
@@ -292,6 +460,18 @@ where
         }
     }
 
+    /// Rotates the matrix around the Z-axis by a given angle.
+    ///
+    /// # Parameters
+    /// - `angle`: The angle of rotation in radians.
+    ///
+    /// # Examples
+    /// ```
+    /// use std::f32::consts::PI;
+    /// let mut mat = Mat4::identity();
+    /// let angle = PI / 4.0; // 45 degrees
+    /// mat.rotate_z(angle);
+    /// ```
     pub fn rotate_z(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
@@ -303,6 +483,23 @@ where
         }
     }
 
+    /// Applies a rotation transformation to the matrix around the X, Y, and Z axes sequentially.
+    ///
+    /// The rotations are applied in the order X -> Y -> Z, meaning that:
+    /// - First, the matrix is rotated around the X-axis by `angles.x`.
+    /// - Then, the resulting matrix is rotated around the Y-axis by `angles.y`.
+    /// - Finally, the resulting matrix is rotated around the Z-axis by `angles.z`.
+    ///
+    /// # Parameters
+    /// - `angles`: A `Vec3<T>` containing the rotation angles (in radians) for the X, Y, and Z axes respectively.
+    ///
+    /// # Examples
+    /// ```
+    /// use std::f32::consts::PI;
+    /// let mut mat = Mat4::identity();
+    /// let angles = Vec3::new(PI / 4.0, PI / 6.0, PI / 3.0);
+    /// mat.rotate_xyz(angles);
+    /// ```
     pub fn rotate_xyz(&mut self, angles: Vec3<T>) {
         let cx = angles.x.cos();
         let sx = angles.x.sin();
@@ -330,6 +527,23 @@ where
         }
     }    
 
+    /// Applies a rotation transformation to the matrix around the Z, Y, and X axes sequentially.
+    ///
+    /// The rotations are applied in the order Z -> Y -> X, meaning that:
+    /// - First, the matrix is rotated around the Z-axis by `angles.z`.
+    /// - Then, the resulting matrix is rotated around the Y-axis by `angles.y`.
+    /// - Finally, the resulting matrix is rotated around the X-axis by `angles.x`.
+    ///
+    /// # Parameters
+    /// - `angles`: A `Vec3<T>` containing the rotation angles (in radians) for the Z, Y, and X axes respectively.
+    ///
+    /// # Examples
+    /// ```
+    /// use std::f32::consts::PI;
+    /// let mut mat = Mat4::identity();
+    /// let angles = Vec3::new(PI / 3.0, PI / 6.0, PI / 4.0);
+    /// mat.rotate_zyx(angles);
+    /// ```
     pub fn rotate_zyx(&mut self, angles: Vec3<T>) {
         let cz = angles.z.cos();
         let sz = angles.z.sin();
@@ -357,6 +571,22 @@ where
         }
     }
 
+    /// Creates a frustum matrix for a perspective projection.
+    ///
+    /// The frustum matrix transforms coordinates from the view frustum to normalized device coordinates.
+    ///
+    /// # Parameters
+    /// - `left`, `right`, `bottom`, `top`: Coordinates of the clipping planes of the view frustum.
+    /// - `near_plane`: The distance to the near clipping plane.
+    /// - `far_plane`: The distance to the far clipping plane.
+    ///
+    /// # Returns
+    /// A `Mat4<T>` representing the frustum projection matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// let frustum = Mat4::frustum(-1.0, 1.0, -1.0, 1.0, 0.1, 100.0);
+    /// ```
     pub fn frustum(left: T, right: T, bottom: T, top: T, near_plane: T, far_plane: T) -> Self {
         let two = T::from(2.0).unwrap();
 
@@ -392,6 +622,23 @@ where
         )
     }
 
+    /// Creates a perspective projection matrix.
+    ///
+    /// This matrix is used to transform coordinates from a perspective projection view to normalized device coordinates.
+    ///
+    /// # Parameters
+    /// - `fov_y`: Field of view in the Y direction (in radians).
+    /// - `aspect`: Aspect ratio of the viewport (width / height).
+    /// - `near_plane`: The distance to the near clipping plane.
+    /// - `far_plane`: The distance to the far clipping plane.
+    ///
+    /// # Returns
+    /// A `Mat4<T>` representing the perspective projection matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// let perspective = Mat4::perspective(std::f32::consts::PI / 4.0, 16.0 / 9.0, 0.1, 100.0);
+    /// ```
     pub fn perspective(fov_y: T, aspect: T, near_plane: T, far_plane: T) -> Self {
         let two = T::from(2.0).unwrap();
 
@@ -432,6 +679,22 @@ where
         )
     }
 
+    /// Creates an orthographic projection matrix.
+    ///
+    /// This matrix maps 3D coordinates to a 2D view with no perspective distortion. It is useful for 2D games or certain types of 3D projections where depth perception is not needed.
+    ///
+    /// # Parameters
+    /// - `left`, `right`, `bottom`, `top`: Coordinates of the clipping planes of the orthographic view.
+    /// - `near_plane`: The distance to the near clipping plane.
+    /// - `far_plane`: The distance to the far clipping plane.
+    ///
+    /// # Returns
+    /// A `Mat4<T>` representing the orthographic projection matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// let ortho = Mat4::orthographic(-1.0, 1.0, -1.0, 1.0, 0.1, 100.0);
+    /// ```
     pub fn orthographic(left: T, right: T, bottom: T, top: T, near_plane: T, far_plane: T) -> Self {
         let two = T::from(2.0).unwrap();
 
@@ -467,6 +730,25 @@ where
         )
     }
 
+    /// Creates a view matrix that orients the camera to look at a specific target.
+    ///
+    /// The view matrix transforms coordinates from world space to camera (or view) space.
+    ///
+    /// # Parameters
+    /// - `eye`: The position of the camera.
+    /// - `target`: The position the camera is looking at.
+    /// - `up`: The up direction of the camera.
+    ///
+    /// # Returns
+    /// A `Mat4<T>` representing the view matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// let eye = Vec3::new(0.0, 0.0, 5.0);
+    /// let target = Vec3::new(0.0, 0.0, 0.0);
+    /// let up = Vec3::new(0.0, 1.0, 0.0);
+    /// let view_matrix = Mat4::look_at(eye, target, up);
+    /// ```
     pub fn look_at(eye: Vec3<T>, target: Vec3<T>, up: Vec3<T>) -> Self {
         let vz = Vec3 {
             x: eye.x - target.x,
