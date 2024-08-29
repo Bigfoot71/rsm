@@ -404,6 +404,20 @@ where
     }
 }
 
+impl<T> Vec4<T> {
+    pub fn convert<U>(self) -> Vec4<U>
+    where
+        T: Into<U> + Copy,
+    {
+        Vec4 {
+            x: self.x.into(),
+            y: self.y.into(),
+            z: self.z.into(),
+            w: self.w.into()
+        }
+    }
+}
+
 impl<T> From<(T, T, T, T)> for Vec4<T>
 where
     T: NumAssign + Copy,

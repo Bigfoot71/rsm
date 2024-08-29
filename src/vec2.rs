@@ -882,6 +882,18 @@ where
     }
 }
 
+impl<T> Vec2<T> {
+    pub fn convert<U>(self) -> Vec2<U>
+    where
+        T: Into<U> + Copy,
+    {
+        Vec2 {
+            x: self.x.into(),
+            y: self.y.into()
+        }
+    }
+}
+
 impl<T> From<(T, T)> for Vec2<T>
 where
     T: NumAssign + Copy,

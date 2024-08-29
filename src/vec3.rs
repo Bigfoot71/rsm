@@ -855,6 +855,19 @@ where
     }
 }
 
+impl<T> Vec3<T> {
+    pub fn convert<U>(self) -> Vec3<U>
+    where
+        T: Into<U> + Copy,
+    {
+        Vec3 {
+            x: self.x.into(),
+            y: self.y.into(),
+            z: self.z.into()
+        }
+    }
+}
+
 impl<T> From<(T, T, T)> for Vec3<T>
 where
     T: NumAssign + Copy,

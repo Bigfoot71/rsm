@@ -389,6 +389,20 @@ where
     }
 }
 
+impl<T> Quat<T> {
+    pub fn convert<U>(self) -> Quat<U>
+    where
+        T: Into<U> + Copy,
+    {
+        Quat {
+            x: self.x.into(),
+            y: self.y.into(),
+            z: self.z.into(),
+            w: self.w.into()
+        }
+    }
+}
+
 impl<T> Index<usize> for Quat<T> {
     type Output = T;
 
