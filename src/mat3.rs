@@ -28,38 +28,107 @@ impl<T> Mat3<T>
 where
     T: NumAssign + Copy,
 {
+    /// Creates a new 3x3 matrix from three columns.
+    ///
+    /// This constructor initializes a `Mat3` instance with the provided column vectors.
+    /// Each column vector is represented as a `Vec3<T>`.
+    ///
+    /// # Parameters
+    /// - `col0`: The first column of the matrix.
+    /// - `col1`: The second column of the matrix.
+    /// - `col2`: The third column of the matrix.
+    ///
+    /// # Returns
+    /// Returns a `Mat3` instance with the specified columns.
+    ///
+    /// # Examples
+    /// ```
+    /// let col0 = Vec3::new(1.0, 0.0, 0.0);
+    /// let col1 = Vec3::new(0.0, 1.0, 0.0);
+    /// let col2 = Vec3::new(0.0, 0.0, 1.0);
+    /// let matrix = Mat3::new(&col0, &col1, &col2);
+    /// ```
     #[inline]
     pub fn new(col0: &Vec3<T>, col1: &Vec3<T>, col2: &Vec3<T>) -> Self {
-        Self (col0.clone(), col1.clone(), col2.clone())
+        Self(col0.clone(), col1.clone(), col2.clone())
     }
 
+    /// Creates a 3x3 zero matrix.
+    ///
+    /// This constructor initializes a `Mat3` instance where all elements are set to zero.
+    ///
+    /// # Returns
+    /// Returns a `Mat3` instance where all columns are zero vectors.
+    ///
+    /// # Examples
+    /// ```
+    /// let matrix = Mat3::zero();
+    /// ```
     #[inline]
     pub fn zero() -> Self {
-        Self (
+        Self(
             Vec3::zero(),
             Vec3::zero(),
             Vec3::zero(),
         )
     }
 
+    /// Creates an identity matrix.
+    ///
+    /// This constructor initializes a `Mat3` instance as the identity matrix, which has `1`s on the diagonal
+    /// and `0`s elsewhere. This is useful for matrix transformations where the identity matrix represents no change.
+    ///
+    /// # Returns
+    /// Returns a `Mat3` instance representing the identity matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// let matrix = Mat3::identity();
+    /// ```
     #[inline]
     pub fn identity() -> Self {
-        Self (
+        Self(
             Vec3::new(T::one(), T::zero(), T::zero()),
             Vec3::new(T::zero(), T::one(), T::zero()),
             Vec3::new(T::zero(), T::zero(), T::one()),
         )
     }
 
+    /// Computes the transpose of the matrix.
+    ///
+    /// This function returns a new `Mat3` instance where the rows and columns of the original matrix are swapped.
+    ///
+    /// # Returns
+    /// Returns the transpose of the matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// let matrix = Mat3::identity();
+    /// let transposed = matrix.transpose();
+    /// ```
     #[inline]
     pub fn transpose(&self) -> Self {
-        Self (
+        Self(
             Vec3::new(self.0.x, self.1.x, self.2.x),
             Vec3::new(self.0.y, self.1.y, self.2.y),
             Vec3::new(self.0.z, self.1.z, self.2.z),
         )
     }
 
+    /// Calculates the determinant of the matrix.
+    ///
+    /// This function computes the determinant of the 3x3 matrix, which can be used to determine if the matrix
+    /// is invertible (a non-zero determinant indicates the matrix is invertible).
+    ///
+    /// # Returns
+    /// Returns the determinant of the matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// let matrix = Mat3::identity();
+    /// let det = matrix.determinant();
+    /// assert_eq!(det, 1.0); // Determinant of the identity matrix
+    /// ```
     pub fn determinant(&self) -> T {
         let a00 = self.0.x;
         let a01 = self.0.y;
@@ -76,10 +145,42 @@ where
         a02 * (a10 * a21 - a11 * a20)
     }
 
+    /// Computes the trace of the matrix.
+    ///
+    /// The trace of a matrix is the sum of its diagonal elements. For a 3x3 matrix, it is the sum of `self.0.x`,
+    /// `self.1.y`, and `self.2.z`.
+    ///
+    /// # Returns
+    /// Returns the trace of the matrix.
+    ///
+    /// # Examples
+    /// ```
+    /// let matrix = Mat3::identity();
+    /// let trace = matrix.trace();
+    /// assert_eq!(trace, 3.0); // Trace of the identity matrix
+    /// ```
     pub fn trace(&self) -> T {
         self.0.x + self.1.y + self.2.z
     }
 
+    /// Multiplies the current matrix by another matrix.
+    ///
+    /// This function performs matrix multiplication with another `Mat3` instance. The resulting matrix is computed
+    /// as the dot products of rows from the first matrix and columns from the second matrix.
+    ///
+    /// # Parameters
+    /// - `other`: The matrix to multiply with.
+    ///
+    /// # Returns
+    /// Returns the product of the two matrices.
+    ///
+    /// # Examples
+    /// ```
+    /// let a = Mat3::identity();
+    /// let b = Mat3::identity();
+    /// let product = a.mul(&b);
+    /// assert_eq!(product, a); // Product of two identity matrices is an identity matrix
+    /// ```
     pub fn mul(&self, other: &Self) -> Self {
         let col0 = Vec3::new(
             self.0.dot(&Vec3::new(other.0.x, other.1.x, other.2.x)),
@@ -99,18 +200,58 @@ where
         Self::new(&col0, &col1, &col2)
     }
 
+    /// Translates the matrix in 2D space.
+    ///
+    /// This function translates the matrix by adding the translation vector to the matrix's translation components.
+    ///
+    /// # Parameters
+    /// - `translate`: The 2D translation vector.
+    ///
+    /// # Examples
+    /// ```
+    /// let mut matrix = Mat3::identity();
+    /// let translate = Vec2::new(2.0, 3.0);
+    /// matrix.translate_2d(&translate);
+    /// ```
     #[inline]
     pub fn translate_2d(&mut self, translate: &Vec2<T>) {
         self.2.x += translate.x;
         self.2.y += translate.y;
     }
 
+    /// Scales the matrix in 2D space.
+    ///
+    /// This function scales the matrix by multiplying the appropriate components of the matrix by the given scale vector.
+    ///
+    /// # Parameters
+    /// - `scale`: The 2D scale vector.
+    ///
+    /// # Examples
+    /// ```
+    /// let mut matrix = Mat3::identity();
+    /// let scale = Vec2::new(2.0, 3.0);
+    /// matrix.scale_2d(&scale);
+    /// ```
     #[inline]
     pub fn scale_2d(&mut self, scale: &Vec2<T>) {
         self.0.x *= scale.x;
         self.1.y *= scale.y;
     }
 
+    /// Scales the matrix in 3D space.
+    ///
+    /// This function scales the matrix by multiplying each component of the matrix with the corresponding component
+    /// of the scale vector.
+    ///
+    /// # Parameters
+    /// - `scale`: The 3D scale vector.
+    ///
+    /// # Examples
+    /// ```
+    /// let mut matrix = Mat3::identity();
+    /// let scale = Vec3::new(2.0, 3.0, 4.0);
+    /// matrix.scale_3d(&scale);
+    /// ```
     #[inline]
     pub fn scale_3d(&mut self, scale: &Vec3<T>) {
         self.0.x *= scale.x;
@@ -123,6 +264,21 @@ impl<T> Mat3<T>
 where
     T: NumAssign + Float
 {
+    /// Computes the inverse of the matrix.
+    ///
+    /// This method calculates the inverse of the 3x3 matrix, if it exists. The inverse of a matrix is used to 
+    /// reverse the effects of the matrix transformation. If the matrix is singular (i.e., its determinant is zero),
+    /// the function returns `None`.
+    ///
+    /// # Returns
+    /// Returns `Some(Self)` containing the inverse of the matrix if the determinant is non-zero; otherwise, returns `None`.
+    ///
+    /// # Examples
+    /// ```
+    /// let matrix = Mat3::identity();
+    /// let inverse = matrix.invert();
+    /// assert!(inverse.is_some()); // Identity matrix is invertible
+    /// ```
     pub fn invert(&self) -> Option<Self> {
         let a00 = self.0.x;
         let a01 = self.0.y;
@@ -153,6 +309,19 @@ where
         ))
     }
 
+    /// Rotates the matrix by a given angle in 2D space.
+    ///
+    /// This method applies a 2D rotation transformation to the matrix. The rotation is counterclockwise by the
+    /// specified angle in radians. This transformation affects only the 2D components of the matrix.
+    ///
+    /// # Parameters
+    /// - `angle`: The angle of rotation in radians.
+    ///
+    /// # Examples
+    /// ```
+    /// let mut matrix = Mat3::identity();
+    /// matrix.rotate_2d(std::f64::consts::FRAC_PI_2); // Rotate by 90 degrees
+    /// ```
     pub fn rotate_2d(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
@@ -174,6 +343,21 @@ where
         self[1][2] = y2;
     }
 
+    /// Rotates the matrix by a given angle around a specified 3D axis.
+    ///
+    /// This method applies a 3D rotation transformation to the matrix. The rotation is counterclockwise around
+    /// the specified axis by the given angle in radians. The axis is normalized before applying the rotation.
+    ///
+    /// # Parameters
+    /// - `axis`: The 3D axis around which to rotate.
+    /// - `angle`: The angle of rotation in radians.
+    ///
+    /// # Examples
+    /// ```
+    /// let mut matrix = Mat3::identity();
+    /// let axis = Vec3::new(0.0, 0.0, 1.0); // Rotation around the Z axis
+    /// matrix.rotate_3d(axis, std::f64::consts::FRAC_PI_2); // Rotate by 90 degrees
+    /// ```
     pub fn rotate_3d(&mut self, mut axis: Vec3<T>, angle: T) {
         let len_sq = axis.length_squared();
         if !(len_sq.is_one() || len_sq.is_zero()) {
@@ -206,6 +390,19 @@ where
         *self = self.mul(rotation);
     }
 
+    /// Rotates the matrix by a given angle around the X-axis in 3D space.
+    ///
+    /// This method applies a 3D rotation transformation to the matrix around the X-axis. The rotation is
+    /// counterclockwise by the specified angle in radians.
+    ///
+    /// # Parameters
+    /// - `angle`: The angle of rotation in radians.
+    ///
+    /// # Examples
+    /// ```
+    /// let mut matrix = Mat3::identity();
+    /// matrix.rotate_x_3d(std::f64::consts::FRAC_PI_2); // Rotate around X-axis by 90 degrees
+    /// ```
     pub fn rotate_x_3d(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
@@ -227,6 +424,19 @@ where
         self[2][2] = z2;
     }    
 
+    /// Rotates the matrix by a given angle around the Y-axis in 3D space.
+    ///
+    /// This method applies a 3D rotation transformation to the matrix around the Y-axis. The rotation is
+    /// counterclockwise by the specified angle in radians.
+    ///
+    /// # Parameters
+    /// - `angle`: The angle of rotation in radians.
+    ///
+    /// # Examples
+    /// ```
+    /// let mut matrix = Mat3::identity();
+    /// matrix.rotate_y_3d(std::f64::consts::FRAC_PI_2); // Rotate around Y-axis by 90 degrees
+    /// ```
     pub fn rotate_y_3d(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
@@ -248,6 +458,19 @@ where
         self[2][2] = z2;
     }
 
+    /// Rotates the matrix by a given angle around the Z-axis in 3D space.
+    ///
+    /// This method applies a 3D rotation transformation to the matrix around the Z-axis. The rotation is
+    /// counterclockwise by the specified angle in radians.
+    ///
+    /// # Parameters
+    /// - `angle`: The angle of rotation in radians.
+    ///
+    /// # Examples
+    /// ```
+    /// let mut matrix = Mat3::identity();
+    /// matrix.rotate_z_3d(std::f64::consts::FRAC_PI_2); // Rotate around Z-axis by 90 degrees
+    /// ```
     pub fn rotate_z_3d(&mut self, angle: T) {
         let c = angle.cos();
         let s = angle.sin();
