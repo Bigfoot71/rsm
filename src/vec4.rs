@@ -405,7 +405,7 @@ where
 }
 
 impl<T> Vec4<T> {
-    pub fn convert<U>(self) -> Vec4<U>
+    pub fn convert<U>(&self) -> Vec4<U>
     where
         T: Into<U> + Copy,
     {

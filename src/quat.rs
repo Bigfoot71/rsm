@@ -390,7 +390,7 @@ where
 }
 
 impl<T> Quat<T> {
-    pub fn convert<U>(self) -> Quat<U>
+    pub fn convert<U>(&self) -> Quat<U>
     where
         T: Into<U> + Copy,
     {

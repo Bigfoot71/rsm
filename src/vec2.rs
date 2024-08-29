@@ -883,7 +883,7 @@ where
 }
 
 impl<T> Vec2<T> {
-    pub fn convert<U>(self) -> Vec2<U>
+    pub fn convert<U>(&self) -> Vec2<U>
     where
         T: Into<U> + Copy,
     {
