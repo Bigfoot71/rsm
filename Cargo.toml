@@ -9,7 +9,7 @@ license-file = "LICENSE.md"
 authors = ["Le Juez Victor"]
 repository = "https://github.com/Bigfoot71/rsm"
 keywords = ["math", "vector", "matrix", "rust"]
-categories = ["mathematics", "linear-algebra"]
+categories = ["mathematics"]
 
 [dependencies]
 num-traits = "0.2.19"
