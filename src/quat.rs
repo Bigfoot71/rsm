@@ -33,21 +33,71 @@ impl<T> Quat<T>
 where
     T: NumAssign + Float + Copy,
 {
+    /// Creates a new `Quat` instance with the given components.
+    ///
+    /// # Parameters
+    /// - `x`, `y`, `z`, `w`: The components of the quaternion.
+    ///
+    /// # Returns
+    /// Returns a new `Quat` with the specified components.
+    ///
+    /// # Examples
+    /// ```
+    /// let q = Quat::new(1.0, 2.0, 3.0, 4.0);
+    /// assert_eq!(q, Quat::new(1.0, 2.0, 3.0, 4.0));
+    /// ```
     #[inline]
     pub fn new(x: T, y: T, z: T, w: T) -> Self {
         Self { x, y, z, w }
     }
 
+    /// Returns the zero quaternion (0, 0, 0, 0).
+    ///
+    /// # Returns
+    /// Returns a new `Quat` where all components are zero.
+    ///
+    /// # Examples
+    /// ```
+    /// let q = Quat::zero();
+    /// assert_eq!(q, Quat::new(0.0, 0.0, 0.0, 0.0));
+    /// ```
     #[inline]
     pub fn zero() -> Self {
         Self::new(T::zero(), T::zero(), T::zero(), T::zero())
     }
 
+    /// Returns the quaternion (1, 1, 1, 1).
+    ///
+    /// # Returns
+    /// Returns a new `Quat` where all components are one.
+    ///
+    /// # Examples
+    /// ```
+    /// let q = Quat::one();
+    /// assert_eq!(q, Quat::new(1.0, 1.0, 1.0, 1.0));
+    /// ```
     #[inline]
     pub fn one() -> Self {
         Self::new(T::one(), T::one(), T::one(), T::one())
     }
 
+    /// Creates a quaternion from Euler angles (roll, pitch, yaw).
+    ///
+    /// This method converts Euler angles into a quaternion representation. It assumes
+    /// the order of rotations is Z-Y-X (yaw-pitch-roll).
+    ///
+    /// # Parameters
+    /// - `roll`: Rotation around the X axis.
+    /// - `pitch`: Rotation around the Y axis.
+    /// - `yaw`: Rotation around the Z axis.
+    ///
+    /// # Returns
+    /// Returns a new `Quat` representing the rotation.
+    ///
+    /// # Examples
+    /// ```
+    /// let q = Quat::from_euler(0.0, std::f64::consts::PI / 2.0, 0.0);
+    /// ```
     #[inline]
     pub fn from_euler(roll: T, pitch: T, yaw: T) -> Self {
         let two = T::from(2.0).unwrap();
@@ -68,16 +118,52 @@ where
         )
     }
 
+    /// Creates a quaternion from a `Vec4` by using its components as the quaternion's
+    /// (x, y, z, w) respectively.
+    ///
+    /// # Parameters
+    /// - `v`: A `Vec4` instance representing the quaternion components.
+    ///
+    /// # Returns
+    /// Returns a new `Quat` with the components taken from `v`.
+    ///
+    /// # Examples
+    /// ```
+    /// let v = Vec4::new(1.0, 2.0, 3.0, 4.0);
+    /// let q = Quat::from_vec4(&v);
+    /// assert_eq!(q, Quat::new(1.0, 2.0, 3.0, 4.0));
+    /// ```
     #[inline]
     pub fn from_vec4(v: &Vec4<T>) -> Self {
         Self::new(v.x, v.y, v.z, v.w)
     }
 
+    /// Converts this quaternion to a `Vec4`.
+    ///
+    /// # Returns
+    /// Returns a `Vec4` with the quaternion's components (x, y, z, w).
+    ///
+    /// # Examples
+    /// ```
+    /// let q = Quat::new(1.0, 2.0, 3.0, 4.0);
+    /// let v = q.to_vec4();
+    /// assert_eq!(v, Vec4::new(1.0, 2.0, 3.0, 4.0));
+    /// ```
     #[inline]
     pub fn to_vec4(&self) -> Vec4<T> {
         Vec4::new(self.x, self.y, self.z, self.w)
     }
 
+    /// Converts this quaternion to a 4x4 transformation matrix.
+    ///
+    /// # Returns
+    /// Returns a `Mat4` representing the rotation described by the quaternion.
+    ///
+    /// # Examples
+    /// ```
+    /// let q = Quat::new(0.0, 0.0, 0.0, 1.0);
+    /// let mat = q.to_mat4();
+    /// ```
     #[inline]
     pub fn to_mat4(&self) -> Mat4<T> {
         let two = T::from(2.0).unwrap();
@@ -102,21 +188,73 @@ where
         )
     }
 
+    /// Computes the dot product of this quaternion and another quaternion.
+    ///
+    /// # Parameters
+    /// - `other`: The other quaternion to compute the dot product with.
+    ///
+    /// # Returns
+    /// Returns the dot product as a `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// let q1 = Quat::new(1.0, 0.0, 0.0, 0.0);
+    /// let q2 = Quat::new(0.0, 1.0, 0.0, 0.0);
+    /// let dot_product = q1.dot(&q2);
+    /// assert_eq!(dot_product, 0.0); // Dot product of orthogonal quaternions
+    /// ```
     #[inline]
     pub fn dot(&self, other: &Self) -> T {
         self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
     }
 
+    /// Computes the squared length of the quaternion.
+    ///
+    /// # Returns
+    /// Returns the squared length as a `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// let q = Quat::new(1.0, 2.0, 3.0, 4.0);
+    /// let length_sq = q.length_squared();
+    /// assert_eq!(length_sq, 30.0); // Squared length of the quaternion
+    /// ```
     #[inline]
     pub fn length_squared(&self) -> T {
         self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w
     }
 
+    /// Computes the length (magnitude) of the quaternion.
+    ///
+    /// # Returns
+    /// Returns the length as a `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// let q = Quat::new(1.0, 2.0, 3.0, 4.0);
+    /// let length = q.length();
+    /// assert_eq!(length, 5.4772256); // Length of the quaternion
+    /// ```
     #[inline]
     pub fn length(&self) -> T {
         (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
     }
 
+    /// Normalizes the quaternion to make its length equal to 1.
+    ///
+    /// If the quaternion is zero-length, normalization is not possible,
+    /// and `None` is returned to indicate this failure.
+    ///
+    /// # Returns
+    /// - `Some(Self)`: The normalized quaternion if the length is non-zero.
+    /// - `None`: If the quaternion is zero-length.
+    ///
+    /// # Examples
+    /// ```
+    /// let q = Quat::new(1.0, 2.0, 3.0, 4.0);
+    /// let normalized = q.normalize();
+    /// assert_eq!(normalized, Some(Quat::new(0.1825742, 0.36514837, 0.5477225, 0.7302967)));
+    /// ```
     #[inline]
     pub fn normalize(&self) -> Option<Self> {
         let len = self.length();
@@ -127,11 +265,40 @@ where
         }
     }
 
+    /// Computes the conjugate of the quaternion.
+    ///
+    /// The conjugate of a quaternion is obtained by negating the x, y, and z components
+    /// while keeping the w component unchanged.
+    ///
+    /// # Returns
+    /// Returns the conjugate of this quaternion.
+    ///
+    /// # Examples
+    /// ```
+    /// let q = Quat::new(1.0, 2.0, 3.0, 4.0);
+    /// let conjugate = q.conjugate();
+    /// assert_eq!(conjugate, Quat::new(-1.0, -2.0, -3.0, 4.0));
+    /// ```
     #[inline]
     pub fn conjugate(&self) -> Self {
         Self::new(-self.x, -self.y, -self.z, self.w)
     }
 
+    /// Computes the inverse of the quaternion.
+    ///
+    /// The inverse of a quaternion is computed using its conjugate and length squared.
+    /// If the length squared is zero, the inverse is not defined and `None` is returned.
+    ///
+    /// # Returns
+    /// - `Some(Self)`: The inverse of the quaternion if the length squared is non-zero.
+    /// - `None`: If the length squared is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// let q = Quat::new(1.0, 2.0, 3.0, 4.0);
+    /// let inverse = q.inverse();
+    /// assert_eq!(inverse, Some(Quat::new(-0.03333333, -0.06666667, -0.1, 0.13333334)));
+    /// ```
     #[inline]
     pub fn inverse(&self) -> Option<Self> {
         let length_squared = self.length_squared();
@@ -142,6 +309,23 @@ where
         }
     }
 
+    /// Multiplies this quaternion by another quaternion.
+    ///
+    /// This method performs quaternion multiplication, which is used to combine rotations.
+    ///
+    /// # Parameters
+    /// - `other`: The quaternion to multiply with.
+    ///
+    /// # Returns
+    /// Returns the resulting quaternion after multiplication.
+    ///
+    /// # Examples
+    /// ```
+    /// let q1 = Quat::new(0.0, 0.0, 0.0, 1.0);
+    /// let q2 = Quat::new(0.0, 1.0, 0.0, 0.0);
+    /// let result = q1.multiply(&q2);
+    /// assert_eq!(result, Quat::new(-1.0, 0.0, 0.0, 0.0)); // Result of quaternion multiplication
+    /// ```
     #[inline]
     pub fn multiply(&self, other: &Self) -> Self {
         Self::new(
@@ -152,6 +336,27 @@ where
         )
     }
 
+    /// Performs spherical linear interpolation (slerp) between two quaternions.
+    ///
+    /// This method computes a quaternion that represents a rotation interpolated between
+    /// `start` and `end` quaternions by a factor `t`. `t` ranges from 0.0 to 1.0, where
+    /// 0.0 results in `start` and 1.0 results in `end`.
+    ///
+    /// # Parameters
+    /// - `start`: The starting quaternion.
+    /// - `end`: The ending quaternion.
+    /// - `t`: The interpolation factor, between 0.0 and 1.0.
+    ///
+    /// # Returns
+    /// Returns the interpolated quaternion.
+    ///
+    /// # Examples
+    /// ```
+    /// let q1 = Quat::new(1.0, 0.0, 0.0, 0.0);
+    /// let q2 = Quat::new(0.0, 1.0, 0.0, 0.0);
+    /// let interpolated = Quat::slerp(&q1, &q2, 0.5);
+    /// assert_eq!(interpolated, Quat::new(0.5, 0.5, 0.0, 0.5)); // Interpolated quaternion
+    /// ```
     #[inline]
     pub fn slerp(start: &Self, end: &Self, t: T) -> Self {
         let dot = start.dot(end);
